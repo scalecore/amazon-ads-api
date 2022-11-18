@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Models\Attribution\RequestParams;
 
+use ScaleCore\AmazonAds\Helpers\Cast;
 use ScaleCore\AmazonAds\Models\RequestParams;
 
 final class TagParams extends RequestParams
@@ -11,7 +12,7 @@ final class TagParams extends RequestParams
     /**
      * {@inheritdoc}
      *
-     * @var array<string, mixed>
+     * @var array<string, array<array-key, string>>
      */
     protected array $params = [
         'publisherIds'  => [],
@@ -39,11 +40,11 @@ final class TagParams extends RequestParams
     ];
 
     /**
-     * @param string[] $publisherIds
+     * @param array<array-key, string|int> $publisherIds
      */
     public function addPublisherIds(array $publisherIds): self
     {
-        $publisherIds = (fn (string ...$publisherIds) => $publisherIds)(...$publisherIds);
+        $publisherIds = (fn (string|int ...$publisherIds) => $publisherIds)(...$publisherIds);
 
         foreach ($publisherIds as $publisherId) {
             $this->addPublisherId($publisherId);
@@ -52,19 +53,19 @@ final class TagParams extends RequestParams
         return $this;
     }
 
-    public function addPublisherId(string $publisherId): self
+    public function addPublisherId(string|int $publisherId): self
     {
-        $this->params['publisherIds'][] = $publisherId;
+        $this->params['publisherIds'][] = Cast::toString($publisherId);
 
         return $this;
     }
 
     /**
-     * @param string[] $advertiserIds
+     * @param array<array-key, string|int> $advertiserIds
      */
     public function addAdvertiserIds(array $advertiserIds): self
     {
-        $advertiserIds = (fn (string ...$ids) => $ids)(...$advertiserIds);
+        $advertiserIds = (fn (string|int ...$ids) => $ids)(...$advertiserIds);
 
         foreach ($advertiserIds as $advertiserId) {
             $this->addAdvertiserId($advertiserId);
@@ -73,9 +74,9 @@ final class TagParams extends RequestParams
         return $this;
     }
 
-    public function addAdvertiserId(string $advertiserId): self
+    public function addAdvertiserId(string|int $advertiserId): self
     {
-        $this->params['advertiserIds'][] = $advertiserId;
+        $this->params['advertiserIds'][] = Cast::toString($advertiserId);
 
         return $this;
     }

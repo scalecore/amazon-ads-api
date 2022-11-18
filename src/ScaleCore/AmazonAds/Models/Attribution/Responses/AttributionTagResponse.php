@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Models\Attribution\Responses;
 
-use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 use ScaleCore\AmazonAds\Helpers\Cast;
 use function ScaleCore\AmazonAds\Helpers\tap;
 use ScaleCore\AmazonAds\Models\Attribution\AttributionTagMap;
@@ -12,9 +11,6 @@ use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-/**
- * @property array<array-key, AttributionTagMap>|null $attributionTagMaps
- */
 final class AttributionTagResponse extends BaseModel
 {
     use JsonSerialize {
@@ -24,13 +20,12 @@ final class AttributionTagResponse extends BaseModel
 
     /** @var array<array-key, AttributionTagMap>|null */
     #[Json(type: AttributionTagMap::class)]
-    protected ?array $attributionTagMaps;
+    public ?array $attributionTagMaps;
 
     /**
      * @param object|array<array-key, mixed>|string $properties
      *
      * @throws \JsonException
-     * @throws ClassNotFoundException
      */
     public function __construct(object|array|string $properties, bool $supportsMacros = true)
     {
@@ -75,8 +70,6 @@ final class AttributionTagResponse extends BaseModel
     /**
      * @param array<array-key, mixed>         $jd
      * @param array<array-key, string>|string $path
-     *
-     * @throws ClassNotFoundException
      */
     public static function fromJsonData($jd, array|string $path = [], bool $supportsMacros = true): self
     {

@@ -125,7 +125,7 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
             function (PerformanceReportResponse $response) use ($groupBy) {
                 /** @var PerformanceReportEntry $report */
                 foreach ($response->reports ?? [] as $report) {
-                    $report->setGroupBy($groupBy);
+                    $report->groupBy = $groupBy;
                 }
             }
         );

@@ -19,15 +19,6 @@ abstract class BaseModel implements Jsonable
         $this->constructFromMixedData($properties);
     }
 
-    public function __get(string $name): mixed
-    {
-        if ( ! \property_exists($this, $name)) {
-            \trigger_error('Undefined property: ' . \get_class($this) . '::$' . $name, E_USER_ERROR);
-        }
-
-        return $this->$name;
-    }
-
     /**
      * @param object|array<array-key, mixed>|string $properties
      */

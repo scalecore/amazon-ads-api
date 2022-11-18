@@ -12,9 +12,9 @@ final class ApiException extends \Exception
     public function __construct(
         string $message = '',
         int $code = 0,
+        ?\Throwable $previous = null,
         protected ?array $responseHeaders = null,
-        protected object|string|null $responseBody = null,
-        ?\Throwable $previous = null
+        protected object|string|null $responseBody = null
     ) {
         parent::__construct($message, $code, $previous);
     }

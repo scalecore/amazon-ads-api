@@ -9,11 +9,9 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use ScaleCore\AmazonAds\Contracts\Arrayable;
 use ScaleCore\AmazonAds\Contracts\HttpRequestBodyInterface;
-use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\MimeType;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
-use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 use ScaleCore\AmazonAds\Helpers\Cast;
 use ScaleCore\AmazonAds\Models\RequestParams;
 use ScaleCore\AmazonAds\Models\RequestResourceData;
@@ -53,9 +51,6 @@ abstract class SubLevelSDK extends BaseSDK
         return $params instanceof Arrayable ? $url . '?' . \http_build_query($params->toArray()) : $url;
     }
 
-    /**
-     * @throws ClassNotFoundException
-     */
     protected function getRequest(
         Region $region,
         RequestResourceData $requestResourceData,
@@ -99,50 +94,7 @@ abstract class SubLevelSDK extends BaseSDK
     }
 
     /**
-     * @throws ClassNotFoundException
-     */
-    protected function makeRequest(
-        HttpMethod $httpMethod,
-        string $path,
-        Region $region,
-        ?int $profileId = null,
-        string|MimeType $accept = MimeType::JSON,
-        string|MimeType $contentType = MimeType::JSON,
-        ?RequestParams $requestParams = null,
-        ?HttpRequestBodyInterface $body = null
-    ): RequestInterface {
-        $request = $this->httpFactory->createRequest(
-            $httpMethod,
-            $this->getApiUrl($region, $path, $requestParams)
-        );
-
-        $headers = [
-            HttpHeaderName::HOST          => $region->host(),
-            HttpHeaderName::AUTHORIZATION => $this->getAuthHeaderValue(),
-        ];
-        if ($profileId !== null) {
-            $headers[HttpHeaderName::AMAZON_SCOPE] = $profileId;
-        }
-
-        $headers = [...$this->getBaseHttpHeaders(accept: $accept, contentType: $contentType), ...$headers];
-
-        foreach ($headers as $name => $header) {
-            $request = $request->withHeader(
-                Cast::toString($name),
-                Cast::toString($header)
-            );
-        }
-
-        if ($body !== null) {
-            $request = $request->withBody($this->httpFactory->createStream(Cast::toString($body)));
-        }
-
-        return $request;
-    }
-
-    /**
      * @throws ApiException
-     * @throws ClassNotFoundException
      */
     protected function getResponse(RequestInterface $request): ResponseInterface
     {
@@ -172,7 +124,6 @@ abstract class SubLevelSDK extends BaseSDK
 
     /**
      * @throws \JsonException
-     * @throws ClassNotFoundException
      */
     protected function decodeResponseBody(ResponseInterface $response): mixed
     {

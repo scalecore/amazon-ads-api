@@ -9,14 +9,11 @@ use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-/**
- * @property array<array-key, Advertiser>|null $advertisers
- */
 final class AdvertisersResponse extends BaseModel
 {
     use JsonSerialize;
 
     /** @var array<array-key, Advertiser>|null */
     #[Json(type: Advertiser::class)]
-    protected ?array $advertisers;
+    public ?array $advertisers;
 }

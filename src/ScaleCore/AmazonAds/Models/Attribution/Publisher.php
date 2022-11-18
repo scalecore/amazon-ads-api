@@ -8,11 +8,6 @@ use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-/**
- * @property string|null $id
- * @property string|null $name
- * @property bool|null   $macroEnabled
- */
 final class Publisher extends BaseModel
 {
     use JsonSerialize;
@@ -21,17 +16,17 @@ final class Publisher extends BaseModel
      * The identifier of a publisher.
      */
     #[Json]
-    protected ?string $id;
+    public ?string $id;
 
     /**
      * The name of the publisher.
      */
     #[Json]
-    protected ?string $name;
+    public ?string $name;
 
     /**
      * Set to 'true' if Amazon Attribution provides macro tags for the given publisher.
      */
     #[Json]
-    protected ?bool $macroEnabled;
+    public ?bool $macroEnabled;
 }

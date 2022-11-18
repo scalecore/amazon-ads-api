@@ -10,27 +10,8 @@ use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
 /**
- * @property PerformanceReportGroupBy|null $groupBy
- * @property string|null                   $date
- * @property string|null                   $advertiserName
- * @property string|null                   $campaignId
- * @property string|null                   $adGroupId
- * @property string|null                   $creativeId
- * @property string|null                   $publisher
- * @property string|null                   $clickThroughs
- * @property string|null                   $Click-throughs
- * @property string|null                   $attributedDetailPageViewsClicks14d
- * @property string|null                   $attributedAddToCartClicks14d
- * @property string|null                   $attributedPurchases14d
- * @property string|null                   $unitsSold14d
- * @property string|null                   $attributedSales14d
- * @property string|null                   $attributedTotalDetailPageViewsClicks14d
- * @property string|null                   $attributedTotalAddToCartClicks14d
- * @property string|null                   $attributedTotalPurchases14d
- * @property string|null                   $totalUnitsSold14d
- * @property string|null                   $totalAttributedSales14d
- * @property string|null                   $brbBonusAmount
- * @property string|null                   $brb_bonus_amount
+ * @property string|null $Click-throughs
+ * @property string|null $brb_bonus_amount
  */
 final class PerformanceReportEntry extends BaseModel
 {
@@ -40,109 +21,109 @@ final class PerformanceReportEntry extends BaseModel
      * Level of aggregation.
      */
     #[Json]
-    protected ?PerformanceReportGroupBy $groupBy;
+    public ?PerformanceReportGroupBy $groupBy;
 
     /**
      * Date on which the events took place, form as "YYYYMMDD".
      */
     #[Json]
-    protected ?string $date;
+    public ?string $date;
 
     /**
      * Name of advertiser.
      */
     #[Json]
-    protected ?string $advertiserName;
+    public ?string $advertiserName;
 
     /**
      * A campaign external identifier.
      */
     #[Json]
-    protected ?string $campaignId;
+    public ?string $campaignId;
 
     /**
      * An ad group external identifier.
      */
     #[Json]
-    protected ?string $adGroupId;
+    public ?string $adGroupId;
 
     /**
      * A creative external identifier.
      */
     #[Json]
-    protected ?string $creativeId;
+    public ?string $creativeId;
 
     /**
      * The publisher name.
      */
     #[Json]
-    protected ?string $publisher;
+    public ?string $publisher;
 
     /**
      * Ad clicks.
      */
     #[Json('Click-throughs')]
-    protected ?string $clickThroughs;
+    public ?string $clickThroughs;
 
     /**
      * Ad click-attributed detail page views for promoted product.
      */
     #[Json]
-    protected ?string $attributedDetailPageViewsClicks14d;
+    public ?string $attributedDetailPageViewsClicks14d;
 
     /**
      * Ad click-attributed add to carts for promoted products.
      */
     #[Json]
-    protected ?string $attributedAddToCartClicks14d;
+    public ?string $attributedAddToCartClicks14d;
 
     /**
      * Ad click-attributed purchases for promoted products.
      */
     #[Json]
-    protected ?string $attributedPurchases14d;
+    public ?string $attributedPurchases14d;
 
     /**
      * Ad click-attributed units sold for promoted products.
      */
     #[Json]
-    protected ?string $unitsSold14d;
+    public ?string $unitsSold14d;
 
     /**
      * Ad click-attributed sales for promoted products in local currency.
      */
     #[Json]
-    protected ?string $attributedSales14d;
+    public ?string $attributedSales14d;
 
     /**
      * Ad click-attributed detail page views for promoted products plus brand halo products.
      */
     #[Json]
-    protected ?string $attributedTotalDetailPageViewsClicks14d;
+    public ?string $attributedTotalDetailPageViewsClicks14d;
 
     /**
      * Ad click-attributed add to carts for promoted products plus brand halo products.
      */
     #[Json]
-    protected ?string $attributedTotalAddToCartClicks14d;
+    public ?string $attributedTotalAddToCartClicks14d;
 
     /**
      * Ad click-attributed purchases for promoted products plus brand halo products.
      */
     #[Json]
-    protected ?string $attributedTotalPurchases14d;
+    public ?string $attributedTotalPurchases14d;
 
     /**
      * Ad click-attributed units sold for promoted products plus brand halo products.
      */
     #[Json]
-    protected ?string $totalUnitsSold14d;
+    public ?string $totalUnitsSold14d;
 
     /**
      * Ad click-attributed attributed sales for promoted products plus brand halo products.
      */
     #[Json]
-    protected ?string $totalAttributedSales14d;
+    public ?string $totalAttributedSales14d;
 
     /**
      * Estimated ad-attributed Brand Referral Bonus credit amount in local currency.
@@ -155,7 +136,7 @@ final class PerformanceReportEntry extends BaseModel
      * to learn more about BRB program.
      */
     #[Json('brb_bonus_amount')]
-    protected ?string $brbBonusAmount;
+    public ?string $brbBonusAmount;
 
     public function __get(string $name): mixed
     {
@@ -167,11 +148,10 @@ final class PerformanceReportEntry extends BaseModel
             return $this->brbBonusAmount;
         }
 
-        return parent::__get($name);
-    }
+        if ( ! \property_exists($this, $name)) {
+            \trigger_error('Undefined property: ' . \get_class($this) . '::$' . $name, E_USER_ERROR);
+        }
 
-    public function setGroupBy(?PerformanceReportGroupBy $groupBy): void
-    {
-        $this->groupBy = $groupBy;
+        return $this->$name;
     }
 }

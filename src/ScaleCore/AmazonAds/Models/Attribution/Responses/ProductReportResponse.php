@@ -9,11 +9,6 @@ use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-/**
- * @property array<array-key, ProductReportEntry>|null $reports
- * @property int|null                                  $count
- * @property string|null                               $cursorId
- */
 final class ProductReportResponse extends BaseModel
 {
     use JsonSerialize;
@@ -24,17 +19,17 @@ final class ProductReportResponse extends BaseModel
      * @var array<array-key, ProductReportEntry>|null
      */
     #[Json(type: ProductReportEntry::class)]
-    protected ?array $reports;
+    public ?array $reports;
 
     /**
      * The size of the report.
      */
     #[Json]
-    protected ?int $count;
+    public ?int $count;
 
     /**
      * The identifier of the pagination cursor.
      */
     #[Json]
-    protected ?string $cursorId;
+    public ?string $cursorId;
 }

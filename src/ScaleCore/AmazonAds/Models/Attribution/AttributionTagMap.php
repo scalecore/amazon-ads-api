@@ -8,12 +8,6 @@ use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-/**
- * @property string|null $advertiserId
- * @property string|null $publisherId
- * @property bool|null   $supportsMacros
- * @property string|null $tagText
- */
 final class AttributionTagMap extends BaseModel
 {
     use JsonSerialize;
@@ -22,23 +16,23 @@ final class AttributionTagMap extends BaseModel
      * The identifier of the advertiser.
      */
     #[Json]
-    protected ?string $advertiserId;
+    public ?string $advertiserId;
 
     /**
      * The identifier of the publisher.
      */
     #[Json]
-    protected ?string $publisherId;
+    public ?string $publisherId;
 
     /**
      * Boolean identifier denoting whether the tag supports macros.
      */
     #[Json]
-    protected ?bool $supportsMacros;
+    public ?bool $supportsMacros;
 
     /**
      * The text of the tag.
      */
     #[Json]
-    protected ?string $tagText;
+    public ?string $tagText;
 }

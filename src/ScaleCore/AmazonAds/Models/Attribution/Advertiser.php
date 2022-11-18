@@ -8,10 +8,6 @@ use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-/**
- * @property string|null $advertiserId
- * @property string|null $advertiserName
- */
 final class Advertiser extends BaseModel
 {
     use JsonSerialize;
@@ -20,11 +16,11 @@ final class Advertiser extends BaseModel
      * The identifier of the advertiser.
      */
     #[Json]
-    protected ?string $advertiserId;
+    public ?string $advertiserId;
 
     /**
      * The name of the advertiser.
      */
     #[Json]
-    protected ?string $advertiserName;
+    public ?string $advertiserName;
 }
