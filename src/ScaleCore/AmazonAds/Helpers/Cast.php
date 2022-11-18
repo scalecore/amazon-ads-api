@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Helpers;
 
-use ScaleCore\AmazonAds\Enums\PrimitiveType;
 use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 
 final class Cast
@@ -20,66 +19,41 @@ final class Cast
         /* Not instantiable, static class only. */
     }
 
-    /**
-     * @param class-string|PrimitiveType $type
-     *
-     * @throws ClassNotFoundException
-     */
-    public static function to(string|PrimitiveType $type, mixed $value): mixed
+    public static function toInt(mixed $value): int
     {
-        if ($type instanceof PrimitiveType) {
-            return self::toPrimitive($type, $value);
-        }
-
-        return self::toClassInstance($type, $value);
+        return (int) $value;
     }
 
-    /**
-     * Wrapper for json_decode.
-     *
-     * @see http://www.php.net/manual/en/function.json-decode.php
-     *
-     * @throws \JsonException
-     */
-    public static function fromJson(string $json, ?bool $associative = null): mixed
+    public static function toFloat(mixed $value): float
     {
-        return json_decode($json, associative: $associative, flags: JSON_THROW_ON_ERROR);
+        return (float) $value;
     }
 
-    /**
-     * Wrapper for JSON encoding.
-     *
-     * @see http://www.php.net/manual/en/function.json-encode.php
-     *
-     * @throws \JsonException
-     */
-    public static function toJson(mixed $value): string
+    public static function toString(mixed $value): string
     {
-        return \json_encode(value: $value, flags: JSON_THROW_ON_ERROR);
+        return (string) $value;
     }
 
-    /**
-     * @return string|int|bool|mixed[]|object|float
-     */
-    private static function toPrimitive(PrimitiveType $type, mixed $value): string|int|bool|array|object|float
-    {
-        return match ($type) {
-            PrimitiveType::INT    => (int) $value,
-            PrimitiveType::FLOAT  => (float) $value,
-            PrimitiveType::STRING => (string) $value,
-            PrimitiveType::BOOL   => self::toBoolean($value),
-            PrimitiveType::ARRAY  => (array) $value,
-            PrimitiveType::OBJECT => (object) $value,
-        };
-    }
-
-    private static function toBoolean(mixed $value): bool
+    public static function toBool(mixed $value): bool
     {
         return match (true) {
             \in_array($value, self::TRUE_VALUES, strict: true)  => true,
             \in_array($value, self::FALSE_VALUES, strict: true) => false,
             default                                             => (bool) $value,
         };
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    public static function toArray(mixed $value): array
+    {
+        return (array) $value;
+    }
+
+    public static function toObject(mixed $value): object
+    {
+        return (object) $value;
     }
 
     /**
@@ -92,7 +66,7 @@ final class Cast
      * @throws ClassNotFoundException
      * @throws \UnexpectedValueException
      */
-    private static function toClassInstance(string $className, mixed $value): object
+    public static function toClassInstance(string $className, mixed $value): object
     {
         if ( ! \class_exists($className)) {
             throw new ClassNotFoundException(\sprintf('Failed to cast property to type `%s`.', $className), $className);
@@ -118,6 +92,30 @@ final class Cast
         }
 
         return new $className($value);
+    }
+
+    /**
+     * Wrapper for json_decode.
+     *
+     * @see http://www.php.net/manual/en/function.json-decode.php
+     *
+     * @throws \JsonException
+     */
+    public static function fromJson(string $json, ?bool $associative = null): mixed
+    {
+        return json_decode($json, associative: $associative, flags: JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * Wrapper for JSON encoding.
+     *
+     * @see http://www.php.net/manual/en/function.json-encode.php
+     *
+     * @throws \JsonException
+     */
+    public static function toJson(mixed $value): string
+    {
+        return \json_encode(value: $value, flags: JSON_THROW_ON_ERROR);
     }
 
     /**

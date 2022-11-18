@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ScaleCore\AmazonAds\Concerns;
+namespace ScaleCore\AmazonAds\API;
 
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use function ScaleCore\AmazonAds\Helpers\tap;
 
-trait ProvidesSubLevelSDK
+abstract class SubLevelSDKProvider extends BaseSDK
 {
     /**
      * @var array<class-string<AdsSDKInterface>, AdsSDKInterface>

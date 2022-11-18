@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\API\Attribution;
 
-use ScaleCore\AmazonAds\API\BaseSDK;
-use ScaleCore\AmazonAds\Concerns\MakesApiCalls;
+use ScaleCore\AmazonAds\API\SubLevelSDK;
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\Attribution\PerformanceReportGroupBy;
 use ScaleCore\AmazonAds\Enums\Attribution\PerformanceReportMetric;
@@ -21,10 +20,8 @@ use ScaleCore\AmazonAds\Models\Attribution\RequestBodies\ProductReportRequest;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\PerformanceReportResponse;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\ProductReportResponse;
 
-final class ReportsSDK extends BaseSDK implements AdsSDKInterface
+final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
 {
-    use MakesApiCalls;
-
     public const RESOURCE_DATA = [
         'getProductReports' => [
             'path'       => '/attribution/report/',

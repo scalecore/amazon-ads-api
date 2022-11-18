@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\API\Attribution;
 
-use ScaleCore\AmazonAds\API\BaseSDK;
-use ScaleCore\AmazonAds\Concerns\ProvidesSubLevelSDK;
+use ScaleCore\AmazonAds\API\SubLevelSDKProvider;
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 
-final class AttributionSDK extends BaseSDK implements AdsSDKInterface
+final class AttributionSDK extends SubLevelSDKProvider implements AdsSDKInterface
 {
-    use ProvidesSubLevelSDK;
-
     public function getPublishersSDK(): PublishersSDK
     {
         return $this->getSDK(PublishersSDK::class);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Helpers;
 
+use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
+
 final class Arr
 {
     private function __construct()
@@ -41,10 +43,12 @@ final class Arr
      *
      * @param \ArrayAccess<TKey, TValue>|array<TKey, TValue> $array
      * @param string|array<array-key, string>                $keys
+     *
+     * @throws ClassNotFoundException
      */
     public static function has(\ArrayAccess|array $array, array|string $keys): bool
     {
-        $keys = (array) $keys;
+        $keys = Cast::toArray($keys);
 
         if ( ! $array || $keys === []) {
             return false;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ScaleCore\AmazonAds\Concerns;
+namespace ScaleCore\AmazonAds\API;
 
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
@@ -11,7 +11,6 @@ use ScaleCore\AmazonAds\Contracts\Arrayable;
 use ScaleCore\AmazonAds\Contracts\HttpRequestBodyInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\MimeType;
-use ScaleCore\AmazonAds\Enums\PrimitiveType;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
 use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
@@ -20,7 +19,7 @@ use ScaleCore\AmazonAds\Models\RequestParams;
 use ScaleCore\AmazonAds\Models\RequestResourceData;
 use ScaleCore\AmazonAds\Support\HttpHeaderName;
 
-trait MakesApiCalls
+abstract class SubLevelSDK extends BaseSDK
 {
     /**
      * @return array<string, string>
@@ -87,13 +86,13 @@ trait MakesApiCalls
 
         foreach ($headers as $name => $header) {
             $request = $request->withHeader(
-                Cast::to(PrimitiveType::STRING, $name),
-                Cast::to(PrimitiveType::STRING, $header)
+                Cast::toString($name),
+                Cast::toString($header)
             );
         }
 
         if ($body !== null) {
-            $request = $request->withBody($this->httpFactory->createStream(Cast::to(PrimitiveType::STRING, $body)));
+            $request = $request->withBody($this->httpFactory->createStream(Cast::toString($body)));
         }
 
         return $request;
@@ -129,13 +128,13 @@ trait MakesApiCalls
 
         foreach ($headers as $name => $header) {
             $request = $request->withHeader(
-                Cast::to(PrimitiveType::STRING, $name),
-                Cast::to(PrimitiveType::STRING, $header)
+                Cast::toString($name),
+                Cast::toString($header)
             );
         }
 
         if ($body !== null) {
-            $request = $request->withBody($this->httpFactory->createStream(Cast::to(PrimitiveType::STRING, $body)));
+            $request = $request->withBody($this->httpFactory->createStream(Cast::toString($body)));
         }
 
         return $request;
@@ -152,7 +151,7 @@ trait MakesApiCalls
         } catch (ClientExceptionInterface $e) {
             throw new ApiException(
                 message: "[{$e->getCode()}] {$e->getMessage()}",
-                code: (int) $e->getCode(),
+                code: Cast::toInt($e->getCode()),
                 previous: $e
             );
         }
@@ -164,7 +163,7 @@ trait MakesApiCalls
                 message: "[$statusCode] Error connecting to the API ({$request->getUri()})",
                 code: $statusCode,
                 responseHeaders: $response->getHeaders(),
-                responseBody: Cast::to(PrimitiveType::STRING, $response->getBody())
+                responseBody: Cast::toString($response->getBody())
             );
         }
 
@@ -180,10 +179,10 @@ trait MakesApiCalls
         return match (MimeType::tryFrom($response->getHeader(HttpHeaderName::CONTENT_TYPE)[0] ?? '')) {
             MimeType::JSON,
             MimeType::OCTET_STREAM => Cast::fromJson(
-                json: Cast::to(PrimitiveType::STRING, $response->getBody()),
+                json: Cast::toString($response->getBody()),
                 associative: true
             ),
-            MimeType::TEXT_PLAIN => Cast::to(PrimitiveType::STRING, $response->getBody()),
+            MimeType::TEXT_PLAIN => Cast::toString($response->getBody()),
             default              => $response->getBody(),
         };
     }

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\API\Attribution;
 
-use ScaleCore\AmazonAds\API\BaseSDK;
-use ScaleCore\AmazonAds\Concerns\MakesApiCalls;
+use ScaleCore\AmazonAds\API\SubLevelSDK;
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
@@ -13,10 +12,8 @@ use ScaleCore\AmazonAds\Exceptions\ApiException;
 use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\PublishersResponse;
 
-final class PublishersSDK extends BaseSDK implements AdsSDKInterface
+final class PublishersSDK extends SubLevelSDK implements AdsSDKInterface
 {
-    use MakesApiCalls;
-
     public const RESOURCE_DATA = [
         'getPublishers' => [
             'path'       => '/attribution/publishers/',

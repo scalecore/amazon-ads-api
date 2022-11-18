@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\API\Attribution;
 
-use ScaleCore\AmazonAds\API\BaseSDK;
-use ScaleCore\AmazonAds\Concerns\MakesApiCalls;
+use ScaleCore\AmazonAds\API\SubLevelSDK;
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
@@ -14,10 +13,8 @@ use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 use ScaleCore\AmazonAds\Models\Attribution\RequestParams\TagParams;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\AttributionTagResponse;
 
-final class TagsSDK extends BaseSDK implements AdsSDKInterface
+final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
 {
-    use MakesApiCalls;
-
     public const RESOURCE_DATA = [
         'getMacroTemplateTags' => [
             'path'       => '/attribution/tags/macroTag/',
