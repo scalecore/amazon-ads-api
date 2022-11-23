@@ -4,36 +4,73 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Exceptions;
 
-final class ApiException extends \Exception
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use ScaleCore\AmazonAds\Contracts\ApiErrorInterface;
+use ScaleCore\AmazonAds\Helpers\Cast;
+
+class ApiException extends \Exception
 {
-    /**
-     * @param array<string, array<array-key, string>>|null $responseHeaders
-     */
     public function __construct(
         string $message = '',
         int $code = 0,
         ?\Throwable $previous = null,
-        protected ?array $responseHeaders = null,
-        protected object|string|null $responseBody = null
+        protected readonly ?RequestInterface $request = null,
+        protected readonly ?ResponseInterface $response = null,
+        protected readonly ?ApiErrorInterface $apiError = null
     ) {
+        $code    = $this->initCode($code);
+        $message = $this->initMessage($message, $code);
+
         parent::__construct($message, $code, $previous);
     }
 
     /**
-     * Gets the HTTP response headers.
-     *
-     * @return array<string, array<array-key, string>>|null
+     * Returns the HTTP server request for the API call.
      */
-    public function getResponseHeaders(): ?array
+    public function getRequest(): ?RequestInterface
     {
-        return $this->responseHeaders;
+        return $this->request;
     }
 
     /**
-     * Gets the HTTP body of the server response either as Json or string.
+     * Returns the HTTP server response for the API call.
      */
-    public function getResponseBody(): object|string|null
+    public function getResponse(): ?ResponseInterface
     {
-        return $this->responseBody;
+        return $this->response;
+    }
+
+    /**
+     * Returns the HTTP server response for the API call.
+     */
+    public function getApiError(): ?ApiErrorInterface
+    {
+        return $this->apiError;
+    }
+
+    protected function initCode(int $code): int
+    {
+        if ($code !== 0) {
+            return $code;
+        }
+
+        return Cast::toInt($this->apiError?->getCode() ?? $this->response?->getStatusCode() ?? $code);
+    }
+
+    protected function initMessage(string $message, int $code): string
+    {
+        if ($message !== '') {
+            return $message;
+        }
+
+        $subMessage = $this->apiError?->getDetails() ?? $this->response?->getReasonPhrase();
+
+        return sprintf(
+            '[%s] %s (%s)',
+            $code,
+            empty($subMessage) ? 'Error connecting to the API' : $subMessage,
+            $this->request?->getUri() ?? ''
+        );
     }
 }

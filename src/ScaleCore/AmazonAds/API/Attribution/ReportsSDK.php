@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\API\Attribution;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use ScaleCore\AmazonAds\API\SubLevelSDK;
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\Attribution\PerformanceReportGroupBy;
@@ -12,8 +14,8 @@ use ScaleCore\AmazonAds\Enums\Attribution\ProductReportMetric;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
-use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 use function ScaleCore\AmazonAds\Helpers\tap;
+use ScaleCore\AmazonAds\Models\ApiError;
 use ScaleCore\AmazonAds\Models\Attribution\PerformanceReportEntry;
 use ScaleCore\AmazonAds\Models\Attribution\RequestBodies\PerformanceReportRequest;
 use ScaleCore\AmazonAds\Models\Attribution\RequestBodies\ProductReportRequest;
@@ -22,7 +24,8 @@ use ScaleCore\AmazonAds\Models\Attribution\Responses\ProductReportResponse;
 
 final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
 {
-    public const RESOURCE_DATA = [
+    /** @var array<string, array<string, mixed>> */
+    protected array $resourceData = [
         'getProductReports' => [
             'path'       => '/attribution/report/',
             'httpMethod' => HttpMethod::POST,
@@ -38,7 +41,6 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
      * @param array<array-key, ProductReportMetric> $metrics
      *
      * @throws ApiException
-     * @throws ClassNotFoundException
      * @throws \JsonException
      */
     public function getProductReports(
@@ -56,7 +58,7 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
                 $this->getResponse(
                     $this->getRequest(
                         region: $region,
-                        requestResourceData: $this->getRequestResourceData(),
+                        requestResourceData: $this->getRequestResource(__FUNCTION__),
                         profileId: $profileId,
                         body: new ProductReportRequest(
                             startDate: $startDate,
@@ -66,7 +68,8 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
                             count: $count,
                             cursorId: $cursorId
                         )
-                    )
+                    ),
+                    __FUNCTION__
                 )
             )
         );
@@ -77,7 +80,6 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
      * @param array<array-key, PerformanceReportMetric> $metrics
      *
      * @throws ApiException
-     * @throws ClassNotFoundException
      * @throws \JsonException
      */
     public function getPerformanceReports(
@@ -98,7 +100,7 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
                     $this->getResponse(
                         $this->getRequest(
                             region: $region,
-                            requestResourceData: $this->getRequestResourceData(),
+                            requestResourceData: $this->getRequestResource(__FUNCTION__),
                             profileId: $profileId,
                             body: new PerformanceReportRequest(
                                 startDate: $startDate,
@@ -109,7 +111,8 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
                                 cursorId: $cursorId,
                                 groupBy: $groupBy
                             )
-                        )
+                        ),
+                        __FUNCTION__
                     )
                 )
             )
@@ -128,6 +131,27 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
                     $report->groupBy = $groupBy;
                 }
             }
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws \JsonException
+     */
+    protected function throwApiException(
+        string $message = '',
+        int $code = 0,
+        ?\Throwable $previous = null,
+        ?RequestInterface $request = null,
+        ?ResponseInterface $response = null
+    ): never {
+        throw new ApiException(
+            message: $message,
+            code: $code,
+            previous: $previous,
+            request: $request,
+            response: $response,
+            apiError: $response === null ? null : ApiError::fromJsonData($this->decodeResponseBody($response))
         );
     }
 }

@@ -13,6 +13,8 @@ abstract class BaseModel implements Jsonable
 {
     /**
      * @param object|array<array-key, mixed>|string $properties
+     *
+     * @throws \JsonException
      */
     public function __construct(object|array|string $properties)
     {
@@ -21,6 +23,8 @@ abstract class BaseModel implements Jsonable
 
     /**
      * @param object|array<array-key, mixed>|string $properties
+     *
+     * @throws \JsonException
      */
     protected function constructFromMixedData(object|array|string $properties): void
     {

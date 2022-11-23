@@ -9,12 +9,12 @@ use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
-use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\PublishersResponse;
 
 final class PublishersSDK extends SubLevelSDK implements AdsSDKInterface
 {
-    public const RESOURCE_DATA = [
+    /** @var array<string, array<string, mixed>> */
+    protected array $resourceData = [
         'getPublishers' => [
             'path'       => '/attribution/publishers/',
             'httpMethod' => HttpMethod::GET,
@@ -23,7 +23,6 @@ final class PublishersSDK extends SubLevelSDK implements AdsSDKInterface
 
     /**
      * @throws ApiException
-     * @throws ClassNotFoundException
      * @throws \JsonException
      */
     public function getPublishers(Region $region, int $profileId): PublishersResponse
@@ -33,9 +32,10 @@ final class PublishersSDK extends SubLevelSDK implements AdsSDKInterface
                 $this->getResponse(
                     $this->getRequest(
                         region: $region,
-                        requestResourceData: $this->getRequestResourceData(),
+                        requestResourceData: $this->getRequestResource(__FUNCTION__),
                         profileId: $profileId
-                    )
+                    ),
+                    __FUNCTION__
                 )
             )
         );

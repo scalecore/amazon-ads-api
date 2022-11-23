@@ -146,7 +146,7 @@ final class LoggerConfiguration
     }
 
     /**
-     * @return array<string>
+     * @return array<array-key, string>
      */
     public function getSkippedHeaders(): array
     {

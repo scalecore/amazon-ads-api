@@ -21,3 +21,13 @@ function value(mixed $value, mixed ...$args): mixed
 {
     return $value instanceof \Closure ? $value(...$args) : $value;
 }
+
+/**
+ * Get the class "basename" of the given object / class.
+ */
+function class_basename(string|object $class): string
+{
+    $class = \is_object($class) ? \get_class($class) : $class;
+
+    return \basename(\str_replace('\\', '/', $class));
+}

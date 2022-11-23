@@ -7,18 +7,124 @@ namespace ScaleCore\AmazonAds\API;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use ScaleCore\AmazonAds\Contracts\AdsSubLevelSDKInterface;
 use ScaleCore\AmazonAds\Contracts\Arrayable;
 use ScaleCore\AmazonAds\Contracts\HttpRequestBodyInterface;
+use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\MimeType;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
+use ScaleCore\AmazonAds\Helpers\Arr;
 use ScaleCore\AmazonAds\Helpers\Cast;
 use ScaleCore\AmazonAds\Models\RequestParams;
-use ScaleCore\AmazonAds\Models\RequestResourceData;
+use ScaleCore\AmazonAds\Models\RequestResource;
 use ScaleCore\AmazonAds\Support\HttpHeaderName;
 
-abstract class SubLevelSDK extends BaseSDK
+abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
 {
+    /**
+     * @throws \UnexpectedValueException
+     */
+    public function getRequestResourceDataPath(string $operation): string
+    {
+        $path = $this->getRequestResourceData($operation, 'path');
+
+        if (is_string($path)) {
+            return $path;
+        }
+
+        throw new \UnexpectedValueException(
+            \sprintf(
+                'Missing or invalid request resource data `path` value for `%s::%s` SDK operation.',
+                $this::class,
+                $operation
+            )
+        );
+    }
+
+    /**
+     * @throws \UnexpectedValueException
+     */
+    public function getRequestResourceDataHttpMethod(string $operation): HttpMethod
+    {
+        $httpMethod = $this->getRequestResourceData($operation, 'httpMethod');
+
+        if ($httpMethod instanceof HttpMethod) {
+            return $httpMethod;
+        }
+
+        throw new \UnexpectedValueException(
+            \sprintf(
+                'Missing or invalid request resource data `httpMethod` value for `%s::%s` SDK operation.',
+                $this::class,
+                $operation
+            )
+        );
+    }
+
+    public function getRequestResourceDataAcceptHeader(string $operation): string|MimeType
+    {
+        $accept = $this->getRequestResourceData($operation, 'accept');
+
+        if (\is_string($accept) || $accept instanceof MimeType) {
+            return $accept;
+        }
+
+        if ($accept === null) {
+            return MimeType::JSON;
+        }
+
+        throw new \UnexpectedValueException(
+            \sprintf(
+                'Invalid request resource data `accept` value for `%s::%s` SDK operation.'
+                . ' Must be null|string|MimeType, %s provided.',
+                $this::class,
+                $operation,
+                \gettype($accept)
+            )
+        );
+    }
+
+    public function getRequestResourceDataContentTypeHeader(string $operation): string|MimeType
+    {
+        $contentType = $this->getRequestResourceData($operation, 'contentType');
+
+        if (\is_string($contentType) || $contentType instanceof MimeType) {
+            return $contentType;
+        }
+
+        if ($contentType === null) {
+            return MimeType::JSON;
+        }
+
+        throw new \UnexpectedValueException(
+            \sprintf(
+                'Invalid request resource data `contentType` value for `%s::%s` SDK operation.'
+                . ' Must be null|string|MimeType, %s provided.',
+                $this::class,
+                $operation,
+                \gettype($contentType)
+            )
+        );
+    }
+
+    protected function getRequestResourceData(string $operation, string $dataPoint): string|HttpMethod|MimeType|null
+    {
+        return Arr::get($this->resourceData ?? [], $operation . '.' . $dataPoint);
+    }
+
+    /**
+     * @param array<string, string> $pathReplacements
+     */
+    protected function getRequestResource(string $operation, array $pathReplacements = []): RequestResource
+    {
+        return RequestResource::for(
+            sdk: $this,
+            operation: $operation,
+            pathReplacements: $pathReplacements
+        );
+    }
+
     /**
      * @return array<string, string>
      */
@@ -53,7 +159,7 @@ abstract class SubLevelSDK extends BaseSDK
 
     protected function getRequest(
         Region $region,
-        RequestResourceData $requestResourceData,
+        RequestResource $requestResourceData,
         ?int $profileId = null,
         ?RequestParams $requestParams = null,
         ?HttpRequestBodyInterface $body = null
@@ -96,30 +202,72 @@ abstract class SubLevelSDK extends BaseSDK
     /**
      * @throws ApiException
      */
-    protected function getResponse(RequestInterface $request): ResponseInterface
+    protected function getResponse(RequestInterface $request, string $operation): ResponseInterface
     {
         try {
+            $correlationId  = $this->configuration->getIdGenerator()->generate();
+            $loggingEnabled = $this->configuration->loggingEnabled($this::class, $operation);
+            $logLevel       = $this->configuration->getLogLevel($this::class, $operation);
+
+            if ($loggingEnabled) {
+                $sanitizedRequest = $request;
+
+                foreach ($this->configuration->loggingSkipHeaders() as $sensitiveHeader) {
+                    $sanitizedRequest = $sanitizedRequest->withoutHeader($sensitiveHeader);
+                }
+
+                $this->logger->log(
+                    $logLevel->label(),
+                    'Amazon Ads API pre request',
+                    [
+                        'api'                    => $this::class,
+                        'operation'              => $operation,
+                        'request_correlation_id' => $correlationId,
+                        'request_body'           => Cast::toString($sanitizedRequest->getBody()),
+                        'request_headers'        => $sanitizedRequest->getHeaders(),
+                        'request_uri'            => Cast::toString($sanitizedRequest->getUri()),
+                    ]
+                );
+            }
+
             $response = $this->httpClient->sendRequest($request);
+
+            if ($loggingEnabled) {
+                $sanitizedResponse = $response;
+
+                foreach ($this->configuration->loggingSkipHeaders() as $sensitiveHeader) {
+                    $sanitizedResponse = $sanitizedResponse->withoutHeader($sensitiveHeader);
+                }
+
+                $this->logger->log(
+                    $logLevel->label(),
+                    'Amazon Ads API post request',
+                    [
+                        'api'                     => $this::class,
+                        'operation'               => $operation,
+                        'response_correlation_id' => $correlationId,
+                        'response_body'           => Cast::toString($sanitizedResponse->getBody()),
+                        'response_headers'        => $sanitizedResponse->getHeaders(),
+                        'response_status_code'    => $sanitizedResponse->getStatusCode(),
+                    ]
+                );
+            }
         } catch (ClientExceptionInterface $e) {
             throw new ApiException(
                 message: "[{$e->getCode()}] {$e->getMessage()}",
                 code: Cast::toInt($e->getCode()),
-                previous: $e
+                previous: $e,
+                request: $request
             );
         }
 
         $statusCode = $response->getStatusCode();
 
-        if ($statusCode < 200 || $statusCode > 299) {
-            throw new ApiException(
-                message: "[$statusCode] Error connecting to the API ({$request->getUri()})",
-                code: $statusCode,
-                responseHeaders: $response->getHeaders(),
-                responseBody: Cast::toString($response->getBody())
-            );
+        if ($statusCode >= 200 && $statusCode < 300) {
+            return $response;
         }
 
-        return $response;
+        $this->throwApiException(request: $request, response: $response);
     }
 
     /**
@@ -139,14 +287,21 @@ abstract class SubLevelSDK extends BaseSDK
     }
 
     /**
-     * @param array<string, string> $pathReplacements
+     * @throws ApiException
      */
-    protected function getRequestResourceData(array $pathReplacements = []): RequestResourceData
-    {
-        return RequestResourceData::for(
-            class: get_class($this),
-            function: debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'],
-            pathReplacements: $pathReplacements
+    protected function throwApiException(
+        string $message = '',
+        int $code = 0,
+        ?\Throwable $previous = null,
+        ?RequestInterface $request = null,
+        ?ResponseInterface $response = null
+    ): never {
+        throw new ApiException(
+            message: $message,
+            code: $code,
+            previous: $previous,
+            request: $request,
+            response: $response
         );
     }
 }
