@@ -5,24 +5,10 @@ declare(strict_types=1);
 namespace ScaleCore\AmazonAds\Models;
 
 use ScaleCore\AmazonAds\Helpers\Cast;
-use Square\Pjson\JsonSerialize;
+use Square\Pjson\JsonDataSerializable;
 
-abstract class BaseDateTime extends \DateTime
+abstract class BaseDateTime extends \DateTime implements JsonDataSerializable
 {
-    use JsonSerialize;
-
-    /**
-     * The format the DateTime instance is converted to when serializing to JSON.
-     *
-     * Use any of the allowed formatting characters or \DateTimeInterface constants
-     * defined at https://www.php.net/manual/en/datetime.format.php.
-     *
-     * To convert to an integer timestamp set this value to `U`.
-     * All other formatting returns string values.
-     * A null value defaults to the DEFAULT_FORMAT of `Ymd`.
-     */
-    protected ?string $format = null;
-
     final public function __construct(string $dateTime = 'now', ?\DateTimeZone $timezone = null)
     {
         parent::__construct($dateTime, $timezone);
