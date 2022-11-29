@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Models\Attribution\RequestBodies;
 
-use ScaleCore\AmazonAds\Contracts\Arrayable;
 use ScaleCore\AmazonAds\Contracts\Attribution\ReportMetricInterface;
-use ScaleCore\AmazonAds\Contracts\Jsonable;
 use ScaleCore\AmazonAds\Enums\Attribution\ReportType;
-use ScaleCore\AmazonAds\Helpers\Cast;
 use function ScaleCore\AmazonAds\Helpers\tap;
+use ScaleCore\AmazonAds\Models\BaseRequestBody;
 
 /**
  * @template TKey of array-key
  * @template TValue of mixed
  *
- * @implements Arrayable<TKey, mixed>
+ * @template-extends BaseRequestBody<TKey, TValue>
  */
-abstract class BaseReportRequest implements Arrayable, Jsonable, \JsonSerializable, \Stringable
+abstract class BaseReportRequest extends BaseRequestBody
 {
     private const MAX_COUNT = 5000;
     private const MIN_COUNT = 1;
@@ -79,30 +77,6 @@ abstract class BaseReportRequest implements Arrayable, Jsonable, \JsonSerializab
                 }
             }
         );
-    }
-
-    /**
-     * @return array<TKey, TValue>
-     */
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function toJson(): string
-    {
-        return Cast::toJson(value: $this->jsonSerialize());
-    }
-
-    /**
-     * @throws \JsonException
-     */
-    public function __toString(): string
-    {
-        return $this->toJson();
     }
 
     protected function validateCount(int $count): void
