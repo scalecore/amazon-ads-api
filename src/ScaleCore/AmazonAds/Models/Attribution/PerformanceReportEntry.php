@@ -6,6 +6,7 @@ namespace ScaleCore\AmazonAds\Models\Attribution;
 
 use ScaleCore\AmazonAds\Enums\Attribution\PerformanceReportGroupBy;
 use ScaleCore\AmazonAds\Models\BaseModel;
+use ScaleCore\AmazonAds\Models\DateTime;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
@@ -24,10 +25,10 @@ final class PerformanceReportEntry extends BaseModel
     public ?PerformanceReportGroupBy $groupBy;
 
     /**
-     * Date on which the events took place, form as "YYYYMMDD".
+     * Date on which the events took place, received in the form of "YYYYMMDD".
      */
     #[Json]
-    public ?string $date;
+    public ?DateTime $date;
 
     /**
      * Name of advertiser.

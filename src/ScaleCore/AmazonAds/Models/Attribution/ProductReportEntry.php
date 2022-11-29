@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ScaleCore\AmazonAds\Models\Attribution;
 
 use ScaleCore\AmazonAds\Models\BaseModel;
+use ScaleCore\AmazonAds\Models\DateTime;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
@@ -13,10 +14,10 @@ final class ProductReportEntry extends BaseModel
     use JsonSerialize;
 
     /**
-     * Date on which the events took place, form as "YYYYMMDD".
+     * Date on which the events took place, received in the form of "YYYYMMDD".
      */
     #[Json]
-    public ?string $date;
+    public ?DateTime $date;
 
     /**
      * Name of the advertiser's brand.
