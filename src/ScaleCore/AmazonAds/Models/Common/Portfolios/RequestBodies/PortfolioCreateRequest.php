@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ScaleCore\AmazonAds\Models\Common\Portfolios\RequestBodies;
 
 use ScaleCore\AmazonAds\Contracts\HttpRequestBodyInterface;
+use ScaleCore\AmazonAds\Enums\Common\Portfolio\PortfolioState;
 use ScaleCore\AmazonAds\Helpers\Cast;
 use ScaleCore\AmazonAds\Helpers\Obj;
 use ScaleCore\AmazonAds\Models\BaseRequestBody;
@@ -20,8 +21,11 @@ use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioList;
  */
 final class PortfolioCreateRequest extends BaseRequestBody implements HttpRequestBodyInterface
 {
-    public function __construct(protected readonly PortfolioList $portfolios)
+    private const MAX_PORTFOLIO_COUNT = 100;
+
+    public function __construct(private readonly PortfolioList $portfolios)
     {
+        $this->validatePortfolios();
     }
 
     /**
@@ -96,5 +100,36 @@ final class PortfolioCreateRequest extends BaseRequestBody implements HttpReques
         }
 
         return Obj::transpose((object) $props, $budget, ...\array_keys($props));
+    }
+
+    private function validatePortfolios(): void
+    {
+        if ($this->portfolios->count() > self::MAX_PORTFOLIO_COUNT) {
+            throw new \LengthException(
+                sprintf(
+                    'The portfolio create operation is limited to the creation of %s portfolios, %s provided.',
+                    self::MAX_PORTFOLIO_COUNT,
+                    $this->portfolios->count()
+                )
+            );
+        }
+
+        foreach ($this->portfolios->toArray() as $portfolio) {
+            if ( ! isset($portfolio->state)) {
+                $portfolio->state = PortfolioState::ENABLED;
+
+                return;
+            }
+
+            if ($portfolio->state !== PortfolioState::ENABLED) {
+                throw new \DomainException(
+                    sprintf(
+                        'The portfolio create operation only allows the `state` value to be %s, %s provided.',
+                        PortfolioState::ENABLED->value,
+                        $portfolio->state->value
+                    )
+                );
+            }
+        }
     }
 }

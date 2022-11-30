@@ -20,8 +20,11 @@ use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioList;
  */
 final class PortfolioUpdateRequest extends BaseRequestBody implements HttpRequestBodyInterface
 {
-    public function __construct(protected readonly PortfolioList $portfolios)
+    private const MAX_PORTFOLIO_COUNT = 100;
+
+    public function __construct(private readonly PortfolioList $portfolios)
     {
+        $this->validatePortfolios();
     }
 
     /**
@@ -66,7 +69,7 @@ final class PortfolioUpdateRequest extends BaseRequestBody implements HttpReques
         );
     }
 
-    protected function transposeBudget(PortfolioBudget $budget): object
+    private function transposeBudget(PortfolioBudget $budget): object
     {
         $props = [
             'amount'    => null,
@@ -85,5 +88,18 @@ final class PortfolioUpdateRequest extends BaseRequestBody implements HttpReques
         }
 
         return Obj::transpose((object) $props, $budget, ...\array_keys($props));
+    }
+
+    private function validatePortfolios(): void
+    {
+        if ($this->portfolios->count() > self::MAX_PORTFOLIO_COUNT) {
+            throw new \LengthException(
+                sprintf(
+                    'The portfolio create operation is limited to the creation of %s portfolios, %s provided.',
+                    self::MAX_PORTFOLIO_COUNT,
+                    $this->portfolios->count()
+                )
+            );
+        }
     }
 }

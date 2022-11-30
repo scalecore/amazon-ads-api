@@ -50,4 +50,9 @@ final class PortfolioList implements Arrayable
     {
         return $this->portfolios;
     }
+
+    public function count(): int
+    {
+        return \count($this->portfolios);
+    }
 }
