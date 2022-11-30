@@ -20,6 +20,7 @@ use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioList;
  */
 final class PortfolioUpdateRequest extends BaseRequestBody implements HttpRequestBodyInterface
 {
+    private const MIN_PORTFOLIO_COUNT = 1;
     private const MAX_PORTFOLIO_COUNT = 100;
 
     public function __construct(private readonly PortfolioList $portfolios)
@@ -92,10 +93,12 @@ final class PortfolioUpdateRequest extends BaseRequestBody implements HttpReques
 
     private function validatePortfolios(): void
     {
-        if ($this->portfolios->count() > self::MAX_PORTFOLIO_COUNT) {
+        $count = $this->portfolios->count();
+        if ($count < self::MIN_PORTFOLIO_COUNT || $count > self::MAX_PORTFOLIO_COUNT) {
             throw new \LengthException(
                 sprintf(
-                    'The portfolio create operation is limited to the creation of %s portfolios, %s provided.',
+                    'The portfolio update operation is limited to between %s and %s portfolios, %s provided.',
+                    self::MIN_PORTFOLIO_COUNT,
                     self::MAX_PORTFOLIO_COUNT,
                     $this->portfolios->count()
                 )
