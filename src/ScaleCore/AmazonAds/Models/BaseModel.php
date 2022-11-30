@@ -12,11 +12,11 @@ use Square\Pjson\Json;
 abstract class BaseModel implements Jsonable
 {
     /**
-     * @param object|array<array-key, mixed>|string $properties
+     * @param object|array<array-key, mixed>|string $properties = null
      *
      * @throws \JsonException
      */
-    public function __construct(object|array|string $properties)
+    public function __construct(object|array|string $properties = [])
     {
         $this->constructFromMixedData($properties);
     }
@@ -29,8 +29,7 @@ abstract class BaseModel implements Jsonable
     protected function constructFromMixedData(object|array|string $properties): void
     {
         $jd    = $this->normalizeProperties($properties);
-        $r     = RClass::make(self::class);
-        $props = $r->getProperties();
+        $props = RClass::make(self::class)->getProperties();
         foreach ($props as $prop) {
             $attrs = $prop->getAttributes(Json::class, \ReflectionAttribute::IS_INSTANCEOF);
             if ($attrs === []) {
