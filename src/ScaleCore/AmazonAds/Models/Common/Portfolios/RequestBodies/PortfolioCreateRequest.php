@@ -112,7 +112,7 @@ final class PortfolioCreateRequest extends BaseRequestBody implements HttpReques
                     'The portfolio create operation is limited to between %s and %s portfolios, %s provided.',
                     self::MIN_PORTFOLIO_COUNT,
                     self::MAX_PORTFOLIO_COUNT,
-                    $this->portfolios->count()
+                    $count
                 )
             );
         }

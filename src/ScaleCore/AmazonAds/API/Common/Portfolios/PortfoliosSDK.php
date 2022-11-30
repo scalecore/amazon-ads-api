@@ -14,12 +14,14 @@ use ScaleCore\AmazonAds\Helpers\Cast;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\Portfolio;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioEx;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioList;
+use ScaleCore\AmazonAds\Models\Common\Portfolios\RequestBodies\PortfolioBudgetUsageRequest;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\RequestBodies\PortfolioCreateRequest;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\RequestBodies\PortfolioUpdateRequest;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\RequestParams\GetPortfoliosParams;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\Responses\CreateOrUpdatePortfoliosResponse;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\Responses\GetPortfoliosExtendedResponse;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\Responses\GetPortfoliosResponse;
+use ScaleCore\AmazonAds\Models\Common\Portfolios\Responses\PortfolioBudgetUsageResponse;
 
 final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
 {
@@ -48,6 +50,12 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         'getPortfolioExtended' => [
             'path'       => '/v2/portfolios/extended/{portfolioId}/',
             'httpMethod' => HttpMethod::GET,
+        ],
+        'getPortfoliosBudgetUsage' => [
+            'path'        => '/portfolios/budget/usage/',
+            'httpMethod'  => HttpMethod::POST,
+            'accept'      => 'application/vnd.portfoliobudgetusage.v1+json',
+            'contentType' => 'application/vnd.portfoliobudgetusage.v1+json',
         ],
     ];
 
@@ -216,6 +224,32 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
                             ['{portfolioId}' => Cast::toString($portfolioId)]
                         ),
                         profileId: $profileId
+                    ),
+                    __FUNCTION__
+                )
+            )
+        );
+    }
+
+    /**
+     * @param array<array-key, string> $portfolioIds
+     *
+     * @throws ApiException
+     * @throws \JsonException
+     */
+    public function getPortfoliosBudgetUsage(
+        Region $region,
+        int $profileId,
+        array $portfolioIds
+    ): PortfolioBudgetUsageResponse {
+        return PortfolioBudgetUsageResponse::fromJsonData(
+            $this->decodeResponseBody(
+                $this->getResponse(
+                    $this->getRequest(
+                        region: $region,
+                        requestResourceData: $this->getRequestResource(__FUNCTION__),
+                        profileId: $profileId,
+                        body: new PortfolioBudgetUsageRequest($portfolioIds)
                     ),
                     __FUNCTION__
                 )

@@ -100,7 +100,7 @@ final class PortfolioUpdateRequest extends BaseRequestBody implements HttpReques
                     'The portfolio update operation is limited to between %s and %s portfolios, %s provided.',
                     self::MIN_PORTFOLIO_COUNT,
                     self::MAX_PORTFOLIO_COUNT,
-                    $this->portfolios->count()
+                    $count
                 )
             );
         }
