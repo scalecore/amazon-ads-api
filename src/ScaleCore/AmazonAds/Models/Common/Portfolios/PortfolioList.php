@@ -12,7 +12,7 @@ use ScaleCore\AmazonAds\Contracts\Arrayable;
 final class PortfolioList implements Arrayable
 {
     /** @var array<array-key, Portfolio> */
-    private array $portfolios;
+    private array $portfolios = [];
 
     /**
      * @param array<array-key, Portfolio> $portfolios
