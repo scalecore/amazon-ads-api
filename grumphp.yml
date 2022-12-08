@@ -1,0 +1,15 @@
+grumphp:
+  stop_on_failure: true
+  ignore_unstaged_changes: true
+  hide_circumvention_tip: true
+  process_timeout: 120
+  fixer:
+    enabled: false
+  tasks:
+    pest: ~
+    phplint: ~
+    phpcsfixer:
+      config: .php-cs-fixer.php
+    phpstan:
+      configuration: phpstan.neon
+      use_grumphp_paths: false
