@@ -253,7 +253,7 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
                 );
             }
         } catch (ClientExceptionInterface $e) {
-            throw new ApiException(
+            $this->throwApiException(
                 message: "[{$e->getCode()}] {$e->getMessage()}",
                 code: Cast::toInt($e->getCode()),
                 previous: $e,

@@ -15,11 +15,10 @@ final class Configuration
 
     private string $tmpFolderPath;
 
-    private IdGenerator $idGenerator;
-
     public function __construct(
         private readonly HttpRequestAuthInterface $httpRequestAuth,
-        private readonly LoggerConfiguration $loggerConfiguration = new LoggerConfiguration()
+        private readonly LoggerConfiguration $loggerConfiguration = new LoggerConfiguration(),
+        private IdGenerator $idGenerator = new UniqidGenerator()
     ) {
         $this->userAgent = \sprintf(
             'Library scalecore/amazon-ads-api (language=PHP %s; Platform=%s %s %s)',
@@ -29,19 +28,27 @@ final class Configuration
             \php_uname('m')
         );
         $this->tmpFolderPath = \sys_get_temp_dir();
-        $this->idGenerator   = new UniqidGenerator();
     }
 
+    /**
+     * Gets the LWA client identifier for API requests.
+     */
     public function getLwaClientID(): string
     {
         return $this->httpRequestAuth->getClientId();
     }
 
+    /**
+     * Gets the libraries user agent header string identifier for API requests.
+     */
     public function getUserAgent(): string
     {
         return $this->userAgent;
     }
 
+    /**
+     * Sets the libraries user agent header string identifier for API requests.
+     */
     public function setUserAgent(string $userAgent): self
     {
         $this->userAgent = $userAgent;
@@ -49,11 +56,17 @@ final class Configuration
         return $this;
     }
 
+    /**
+     * Gets the application temp folder path.
+     */
     public function getTmpFolderPath(): string
     {
         return $this->tmpFolderPath;
     }
 
+    /**
+     * Sets the application temp folder path.
+     */
     public function setTmpFolderPath(string $tmpFolderPath): self
     {
         $this->tmpFolderPath = $tmpFolderPath;
@@ -61,16 +74,25 @@ final class Configuration
         return $this;
     }
 
+    /**
+     * Gets the applications logger configuration.
+     */
     public function getLoggerConfiguration(): LoggerConfiguration
     {
         return $this->loggerConfiguration;
     }
 
+    /**
+     * Gets the application HTTP request authorization object.
+     */
     public function getHttpRequestAuth(): HttpRequestAuthInterface
     {
         return $this->httpRequestAuth;
     }
 
+    /**
+     * Sets the application default log level.
+     */
     public function setDefaultLogLevel(LogLevel $logLevel): self
     {
         $this->loggerConfiguration->setDefaultLogLevel($logLevel);
@@ -78,18 +100,36 @@ final class Configuration
         return $this;
     }
 
-    public function setLogLevel(string $api, string $operationMethod, LogLevel $logLevel): self
+    /**
+     * Sets the log level for an api operation.
+     *
+     * @param string $api       The API class name
+     * @param string $operation The API method name
+     */
+    public function setLogLevel(string $api, string $operation, LogLevel $logLevel): self
     {
-        $this->loggerConfiguration->setLogLevel($api, $operationMethod, $logLevel);
+        $this->loggerConfiguration->setLogLevel($api, $operation, $logLevel);
 
         return $this;
     }
 
+    /**
+     * Gets the log level for an api operation.
+     *
+     * @param string $api       The API class name
+     * @param string $operation The API method name
+     */
     public function getLogLevel(string $api, string $operation): LogLevel
     {
         return $this->loggerConfiguration->getLogLevel($api, $operation);
     }
 
+    /**
+     * Sets the logging to be skipped for an api or operation.
+     *
+     * @param string      $api       The API class name
+     * @param string|null $operation The API method name, if null entire API skipped
+     */
     public function setSkipLogging(string $api, string $operation = null): self
     {
         if ($operation !== null) {
@@ -103,6 +143,12 @@ final class Configuration
         return $this;
     }
 
+    /**
+     * Sets the logging to be enabled for an api or operation.
+     *
+     * @param string      $api       The API class name
+     * @param string|null $operation The API method name, if null entire API enabled
+     */
     public function setEnableLogging(string $api, string $operation = null): self
     {
         if ($operation !== null) {
@@ -116,11 +162,20 @@ final class Configuration
         return $this;
     }
 
+    /**
+     * Returns wether the logging is enabled for an api or operation.
+     *
+     * @param string      $api       The API class name
+     * @param string|null $operation The API method name, if null API status returned
+     */
     public function loggingEnabled(string $api, string $operation = null): bool
     {
         return ! $this->loggerConfiguration->isSkipped($api, $operation);
     }
 
+    /**
+     * Add header to be skipped/not included in logged output.
+     */
     public function loggingAddSkippedHeader(string $headerName): self
     {
         $this->loggerConfiguration->addSkippedHeader($headerName);
@@ -128,6 +183,9 @@ final class Configuration
         return $this;
     }
 
+    /**
+     * Remove header from list of headers skipped/not included in logged output.
+     */
     public function loggingRemoveSkippedHeader(string $headerName): self
     {
         $this->loggerConfiguration->removeSkippedHeader($headerName);
@@ -136,6 +194,8 @@ final class Configuration
     }
 
     /**
+     * Return the list of headers excluded from the logged output.
+     *
      * @return array<array-key, string>
      */
     public function loggingSkipHeaders(): array
@@ -143,11 +203,17 @@ final class Configuration
         return $this->loggerConfiguration->getSkippedHeaders();
     }
 
+    /**
+     * Return the IDGenerator used to generate unique id's attached to logging.
+     */
     public function getIdGenerator(): IdGenerator
     {
         return $this->idGenerator;
     }
 
+    /**
+     * Set the IDGenerator used to generate unique id's attached to logging.
+     */
     public function setIdGenerator(IdGenerator $idGenerator): self
     {
         $this->idGenerator = $idGenerator;
