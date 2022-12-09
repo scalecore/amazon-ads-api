@@ -29,7 +29,7 @@ abstract class BaseModel implements Jsonable
     protected function constructFromMixedData(object|array|string $properties): void
     {
         $jd    = $this->normalizeProperties($properties);
-        $props = RClass::make(self::class)->getProperties();
+        $props = RClass::make(static::class)->getProperties();
         foreach ($props as $prop) {
             $attrs = $prop->getAttributes(Json::class, \ReflectionAttribute::IS_INSTANCEOF);
             if ($attrs === []) {

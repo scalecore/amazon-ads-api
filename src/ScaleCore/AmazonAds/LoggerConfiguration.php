@@ -43,6 +43,9 @@ final class LoggerConfiguration
         ];
     }
 
+    /**
+     * Sets the application default log level.
+     */
     public function setDefaultLogLevel(LogLevel $logLevel): self
     {
         $this->defaultLogLevel = $logLevel;
@@ -50,6 +53,12 @@ final class LoggerConfiguration
         return $this;
     }
 
+    /**
+     * Sets the log level for an api operation.
+     *
+     * @param string $api       The API class name
+     * @param string $operation The API method name
+     */
     public function setLogLevel(string $api, string $operation, LogLevel $logLevel): self
     {
         $this->customLogLevels[$api] ??= [];
@@ -59,11 +68,22 @@ final class LoggerConfiguration
         return $this;
     }
 
+    /**
+     * Gets the log level for an api operation.
+     *
+     * @param string $api       The API class name
+     * @param string $operation The API method name
+     */
     public function getLogLevel(string $api, string $operation): LogLevel
     {
         return $this->customLogLevels[$api][$operation] ?? $this->defaultLogLevel;
     }
 
+    /**
+     * Sets the logging to be skipped for an api.
+     *
+     * @param string $api The API class name
+     */
     public function skipAPI(string $api): self
     {
         if ( ! \in_array($api, $this->skippedAPIs, true)) {
@@ -73,6 +93,11 @@ final class LoggerConfiguration
         return $this;
     }
 
+    /**
+     * Sets the logging to be enabled for an api.
+     *
+     * @param string $api The API class name
+     */
     public function enableAPI(string $api): self
     {
         $apiKey = \array_search($api, $this->skippedAPIs, true);
@@ -86,6 +111,12 @@ final class LoggerConfiguration
         return $this;
     }
 
+    /**
+     * Sets the logging to be skipped for an api and operation.
+     *
+     * @param string $api       The API class name
+     * @param string $operation The API method name
+     */
     public function skipAPIOperation(string $api, string $operation): self
     {
         $this->skippedAPIOperations[$api] ??= [];
@@ -97,6 +128,12 @@ final class LoggerConfiguration
         return $this;
     }
 
+    /**
+     * Sets the logging to be enabled for an api and operation.
+     *
+     * @param string $api       The API class name
+     * @param string $operation The API method name
+     */
     public function enableAPIOperation(string $api, string $operation): self
     {
         if ( ! isset($this->skippedAPIOperations[$api])) {
@@ -116,6 +153,12 @@ final class LoggerConfiguration
         return $this;
     }
 
+    /**
+     * Returns wether the logging is skipped for an api and/or operation.
+     *
+     * @param string      $api       The API class name
+     * @param string|null $operation The API method name, if null the API as a whole
+     */
     public function isSkipped(string $api, string $operation = null): bool
     {
         if (\in_array($api, $this->skippedAPIs, true)) {
@@ -125,6 +168,9 @@ final class LoggerConfiguration
         return \in_array($operation, $this->skippedAPIOperations[$api] ?? [], true);
     }
 
+    /**
+     * Add header to be skipped/not included in logged output.
+     */
     public function addSkippedHeader(string $headerName): self
     {
         if ( ! \in_array(\strtolower($headerName), $this->skippedHttpHeaders, true)) {
@@ -134,6 +180,9 @@ final class LoggerConfiguration
         return $this;
     }
 
+    /**
+     * Remove header from list of headers skipped/not included in logged output.
+     */
     public function removeSkippedHeader(string $headerName): self
     {
         $headerKey = \array_search(\strtolower($headerName), $this->skippedHttpHeaders, true);
@@ -146,6 +195,8 @@ final class LoggerConfiguration
     }
 
     /**
+     * Return the list of headers excluded from the logged output.
+     *
      * @return array<array-key, string>
      */
     public function getSkippedHeaders(): array
@@ -153,6 +204,9 @@ final class LoggerConfiguration
         return $this->skippedHttpHeaders;
     }
 
+    /**
+     * Return wether the header is skipped/not included in logged output.
+     */
     public function headerIsSkipped(string $headerName): bool
     {
         return \in_array(\strtolower($headerName), $this->skippedHttpHeaders, true);
