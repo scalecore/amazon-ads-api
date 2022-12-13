@@ -53,15 +53,14 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
      * @throws \JsonException
      * @throws ApiException
      */
-    public function getManagerAccounts(Region $region, int $profileId): GetManagerAccountsResponse
+    public function getManagerAccounts(Region $region): GetManagerAccountsResponse
     {
         return GetManagerAccountsResponse::fromJsonData(
             $this->decodeResponseBody(
                 $this->getResponse(
                     $this->getRequest(
                         region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId
+                        requestResourceData: $this->getRequestResource(__FUNCTION__)
                     ),
                     __FUNCTION__
                 )
@@ -77,7 +76,6 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
      */
     public function createManagerAccount(
         Region $region,
-        int $profileId,
         string $managerAccountName,
         ManagerAccountType $managerAccountType
     ): ManagerAccount {
@@ -87,7 +85,6 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
                     $this->getRequest(
                         region: $region,
                         requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
                         body: new CreateManagerAccountRequest($managerAccountName, $managerAccountType)
                     ),
                     __FUNCTION__
@@ -104,7 +101,6 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
      */
     public function associateWithManagerAccount(
         Region $region,
-        int $profileId,
         string $managerAccountId,
         AccountToUpdateList $accounts
     ): UpdateAdvertisingAccountsInManagerAccountResponse {
@@ -117,7 +113,6 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
                             __FUNCTION__,
                             ['{managerAccountId}' => $managerAccountId]
                         ),
-                        profileId: $profileId,
                         body: new UpdateAdvertisingAccountsInManagerAccountRequest($accounts)
                     ),
                     __FUNCTION__
@@ -134,7 +129,6 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
      */
     public function disassociateWithManagerAccount(
         Region $region,
-        int $profileId,
         string $managerAccountId,
         AccountToUpdateList $accounts
     ): UpdateAdvertisingAccountsInManagerAccountResponse {
@@ -147,7 +141,6 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
                             __FUNCTION__,
                             ['{managerAccountId}' => $managerAccountId]
                         ),
-                        profileId: $profileId,
                         body: new UpdateAdvertisingAccountsInManagerAccountRequest($accounts)
                     ),
                     __FUNCTION__
