@@ -14,7 +14,6 @@ use Square\Pjson\JsonSerialize;
 final class AttributionTagResponse extends BaseModel
 {
     use JsonSerialize {
-        fromJsonString as traitFromJsonString;
         fromJsonData as traitFromJsonData;
     }
 
@@ -48,30 +47,10 @@ final class AttributionTagResponse extends BaseModel
     }
 
     /**
-     * @param array<array-key, string>|string $path
-     * @param int<1, max>                     $depth
-     */
-    public static function fromJsonString(
-        string $json,
-        array|string $path = [],
-        int $depth = 512,
-        int $flags = 0,
-        bool $supportsMacros = true
-    ): self {
-        $flags |= JSON_THROW_ON_ERROR;
-
-        return self::fromJsonData(
-            json_decode($json, associative: true, depth: $depth, flags: $flags),
-            $path,
-            $supportsMacros
-        );
-    }
-
-    /**
      * @param array<array-key, mixed>         $jd
      * @param array<array-key, string>|string $path
      */
-    public static function fromJsonData($jd, array|string $path = [], bool $supportsMacros = true): self
+    public static function fromJsonData($jd, array|string $path = [], bool $supportsMacros = true): static
     {
         return self::traitFromJsonData(
             tap(

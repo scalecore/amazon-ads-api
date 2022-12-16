@@ -11,6 +11,7 @@ use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\AccountToUpdateList;
+use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\ErrorDetail;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\ManagerAccount;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\RequestBodies\CreateManagerAccountRequest;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\RequestBodies\UpdateAdvertisingAccountsInManagerAccountRequest;
@@ -22,24 +23,24 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
     /** @var array<string, array<string, mixed>> */
     protected array $resourceData = [
         'getManagerAccounts' => [
-            'path'       => '/managerAccounts/',
+            'path'       => '/managerAccounts',
             'httpMethod' => HttpMethod::GET,
             'accept'     => 'application/vnd.getmanageraccountsresponse.v1+json',
         ],
         'createManagerAccount' => [
-            'path'         => '/managerAccounts/',
+            'path'         => '/managerAccounts',
             'httpMethod'   => HttpMethod::POST,
             'accept'       => 'application/vnd.manageraccount.v1+json',
             'content-type' => 'application/vnd.createmanageraccountrequest.v1+json',
         ],
         'associateWithManagerAccount' => [
-            'path'        => '/managerAccounts/{managerAccountId}/associate/',
+            'path'        => '/managerAccounts/{managerAccountId}/associate',
             'httpMethod'  => HttpMethod::POST,
             'accept'      => 'application/vnd.updateadvertisingaccountsinmanageraccountresponse.v1+json',
             'contentType' => 'application/vnd.updateadvertisingaccountsinmanageraccountrequest.v1+json',
         ],
         'disassociateWithManagerAccount' => [
-            'path'        => '/managerAccounts/{managerAccountId}/disassociate/',
+            'path'        => '/managerAccounts/{managerAccountId}/disassociate',
             'httpMethod'  => HttpMethod::POST,
             'accept'      => 'application/vnd.updateadvertisingaccountsinmanageraccountresponse.v1+json',
             'contentType' => 'application/vnd.updateadvertisingaccountsinmanageraccountrequest.v1+json',
@@ -55,17 +56,16 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
      */
     public function getManagerAccounts(Region $region): GetManagerAccountsResponse
     {
-        return GetManagerAccountsResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__)
         );
+
+        if ($responseResource->hasSucceeded()) {
+            return GetManagerAccountsResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -79,17 +79,19 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
         string $managerAccountName,
         ManagerAccountType $managerAccountType
     ): ManagerAccount {
-        return ManagerAccount::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        body: new CreateManagerAccountRequest($managerAccountName, $managerAccountType)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            body: new CreateManagerAccountRequest($managerAccountName, $managerAccountType)
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return ManagerAccount::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ErrorDetail::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -104,20 +106,22 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
         string $managerAccountId,
         AccountToUpdateList $accounts
     ): UpdateAdvertisingAccountsInManagerAccountResponse {
-        return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(
-                            __FUNCTION__,
-                            ['{managerAccountId}' => $managerAccountId]
-                        ),
-                        body: new UpdateAdvertisingAccountsInManagerAccountRequest($accounts)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(
+                __FUNCTION__,
+                ['{managerAccountId}' => $managerAccountId]
+            ),
+            body: new UpdateAdvertisingAccountsInManagerAccountRequest($accounts)
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ErrorDetail::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -132,20 +136,22 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
         string $managerAccountId,
         AccountToUpdateList $accounts
     ): UpdateAdvertisingAccountsInManagerAccountResponse {
-        return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(
-                            __FUNCTION__,
-                            ['{managerAccountId}' => $managerAccountId]
-                        ),
-                        body: new UpdateAdvertisingAccountsInManagerAccountRequest($accounts)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(
+                __FUNCTION__,
+                ['{managerAccountId}' => $managerAccountId]
+            ),
+            body: new UpdateAdvertisingAccountsInManagerAccountRequest($accounts)
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ErrorDetail::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 }

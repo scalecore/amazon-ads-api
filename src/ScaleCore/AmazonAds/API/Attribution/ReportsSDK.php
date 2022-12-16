@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\API\Attribution;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use ScaleCore\AmazonAds\API\SubLevelSDK;
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\Attribution\PerformanceReportGroupBy;
@@ -27,11 +25,11 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
     /** @var array<string, array<string, mixed>> */
     protected array $resourceData = [
         'getProductReports' => [
-            'path'       => '/attribution/report/',
+            'path'       => '/attribution/report',
             'httpMethod' => HttpMethod::POST,
         ],
         'getPerformanceReports' => [
-            'path'       => '/attribution/report/',
+            'path'       => '/attribution/report',
             'httpMethod' => HttpMethod::POST,
         ],
     ];
@@ -53,25 +51,27 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
         int $count = 5000,
         ?string $cursorId = null
     ): ProductReportResponse {
-        return ProductReportResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        body: new ProductReportRequest(
-                            startDate: $startDate,
-                            endDate: $endDate,
-                            advertiserIds: $advertiserIds,
-                            metrics: $metrics,
-                            count: $count,
-                            cursorId: $cursorId
-                        )
-                    ),
-                    __FUNCTION__
-                )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            body: new ProductReportRequest(
+                startDate: $startDate,
+                endDate: $endDate,
+                advertiserIds: $advertiserIds,
+                metrics: $metrics,
+                count: $count,
+                cursorId: $cursorId
             )
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return ProductReportResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -93,29 +93,31 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
         ?string $cursorId = null,
         PerformanceReportGroupBy $groupBy = PerformanceReportGroupBy::CREATIVE
     ): PerformanceReportResponse {
-        return $this->addGroupByToResponse(
-            $groupBy,
-            PerformanceReportResponse::fromJsonData(
-                $this->decodeResponseBody(
-                    $this->getResponse(
-                        $this->getRequest(
-                            region: $region,
-                            requestResourceData: $this->getRequestResource(__FUNCTION__),
-                            profileId: $profileId,
-                            body: new PerformanceReportRequest(
-                                startDate: $startDate,
-                                endDate: $endDate,
-                                advertiserIds: $advertiserIds,
-                                metrics: $metrics,
-                                count: $count,
-                                cursorId: $cursorId,
-                                groupBy: $groupBy
-                            )
-                        ),
-                        __FUNCTION__
-                    )
-                )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            body: new PerformanceReportRequest(
+                startDate: $startDate,
+                endDate: $endDate,
+                advertiserIds: $advertiserIds,
+                metrics: $metrics,
+                count: $count,
+                cursorId: $cursorId,
+                groupBy: $groupBy
             )
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return $this->addGroupByToResponse(
+                $groupBy,
+                PerformanceReportResponse::fromJsonData($responseResource->decodeResponseBody())
+            );
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -131,27 +133,6 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
                     $report->groupBy = $groupBy;
                 }
             }
-        );
-    }
-
-    /**
-     * @throws ApiException
-     * @throws \JsonException
-     */
-    protected function throwApiException(
-        string $message = '',
-        int $code = 0,
-        ?\Throwable $previous = null,
-        ?RequestInterface $request = null,
-        ?ResponseInterface $response = null
-    ): never {
-        throw new ApiException(
-            message: $message,
-            code: $code,
-            previous: $previous,
-            request: $request,
-            response: $response,
-            apiError: $response === null ? null : ApiError::fromJsonData($this->decodeResponseBody($response))
         );
     }
 }

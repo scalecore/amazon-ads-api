@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Helpers;
 
+use ScaleCore\AmazonAds\Enums\MimeType;
 use ScaleCore\AmazonAds\Exceptions\ClassNotFoundException;
 
 final class Cast
@@ -116,6 +117,18 @@ final class Cast
     public static function toJson(mixed $value): string
     {
         return \json_encode(value: $value, flags: JSON_THROW_ON_ERROR);
+    }
+
+    public static function toMimeType(string $mimeTypeString): ?MimeType
+    {
+        $mimeTypeString = \strtolower($mimeTypeString);
+        if ($mimeTypeString === '') {
+            return null;
+        }
+
+        $mimeType = MimeType::tryFrom($mimeTypeString);
+
+        return $mimeType?->isJson() ?? \str_ends_with($mimeTypeString, 'json') ? MimeType::JSON : $mimeType;
     }
 
     /**
