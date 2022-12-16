@@ -16,7 +16,7 @@ final class AdvertisersSDK extends SubLevelSDK implements AdsSDKInterface
     /** @var array<string, array<string, mixed>> */
     protected array $resourceData = [
         'getAdvertisers' => [
-            'path'       => '/attribution/advertisers/',
+            'path'       => '/attribution/advertisers',
             'httpMethod' => HttpMethod::GET,
         ],
     ];
@@ -27,17 +27,16 @@ final class AdvertisersSDK extends SubLevelSDK implements AdsSDKInterface
      */
     public function getAdvertisers(Region $region, int $profileId): AdvertisersResponse
     {
-        return AdvertisersResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId
         );
+
+        if ($responseResource->hasSucceeded()) {
+            return AdvertisersResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 }

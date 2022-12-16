@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\API\Attribution;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use ScaleCore\AmazonAds\API\SubLevelSDK;
 use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
@@ -20,11 +18,11 @@ final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
     /** @var array<string, array<string, mixed>> */
     protected array $resourceData = [
         'getMacroTemplateTags' => [
-            'path'       => '/attribution/tags/macroTag/',
+            'path'       => '/attribution/tags/macroTag',
             'httpMethod' => HttpMethod::GET,
         ],
         'getNonMacroTemplateTags' => [
-            'path'       => '/attribution/tags/nonMacroTemplateTag/',
+            'path'       => '/attribution/tags/nonMacroTemplateTag',
             'httpMethod' => HttpMethod::GET,
         ],
     ];
@@ -42,23 +40,25 @@ final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
         array $publisherIds,
         array $advertiserIds = []
     ): AttributionTagResponse {
-        return AttributionTagResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        requestParams: new TagParams(
-                            [
-                                'publisherIds'  => $publisherIds,
-                                'advertiserIds' => $advertiserIds,
-                            ]
-                        )
-                    ),
-                    __FUNCTION__
-                )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            requestParams: new TagParams(
+                [
+                    'publisherIds'  => $publisherIds,
+                    'advertiserIds' => $advertiserIds,
+                ]
             )
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return AttributionTagResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -75,45 +75,28 @@ final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
         array $publisherIds,
         array $advertiserIds = []
     ): AttributionTagResponse {
-        return AttributionTagResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        requestParams: new TagParams(
-                            [
-                                'publisherIds'  => $publisherIds,
-                                'advertiserIds' => $advertiserIds,
-                            ]
-                        )
-                    ),
-                    __FUNCTION__
-                )
-            ),
-            supportsMacros: false
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            requestParams: new TagParams(
+                [
+                    'publisherIds'  => $publisherIds,
+                    'advertiserIds' => $advertiserIds,
+                ]
+            )
         );
-    }
 
-    /**
-     * @throws ApiException
-     * @throws \JsonException
-     */
-    protected function throwApiException(
-        string $message = '',
-        int $code = 0,
-        ?\Throwable $previous = null,
-        ?RequestInterface $request = null,
-        ?ResponseInterface $response = null
-    ): never {
-        throw new ApiException(
-            message: $message,
-            code: $code,
-            previous: $previous,
-            request: $request,
-            response: $response,
-            apiError: $response === null ? null : ApiError::fromJsonData($this->decodeResponseBody($response))
+        if ($responseResource->hasSucceeded()) {
+            return AttributionTagResponse::fromJsonData(
+                $responseResource->decodeResponseBody(),
+                supportsMacros: false
+            );
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 }

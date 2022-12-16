@@ -11,6 +11,7 @@ use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
 use ScaleCore\AmazonAds\Helpers\Cast;
+use ScaleCore\AmazonAds\Models\ApiError;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\Portfolio;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioEx;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioList;
@@ -28,31 +29,31 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
     /** @var array<string, array<string, mixed>> */
     protected array $resourceData = [
         'getPortfolios' => [
-            'path'       => '/v2/portfolios/',
+            'path'       => '/v2/portfolios',
             'httpMethod' => HttpMethod::GET,
         ],
         'getPortfolio' => [
-            'path'       => '/v2/portfolios/{portfolioId}/',
+            'path'       => '/v2/portfolios/{portfolioId}',
             'httpMethod' => HttpMethod::GET,
         ],
         'createPortfolios' => [
-            'path'       => '/v2/portfolios/',
+            'path'       => '/v2/portfolios',
             'httpMethod' => HttpMethod::POST,
         ],
         'updatePortfolios' => [
-            'path'       => '/v2/portfolios/',
+            'path'       => '/v2/portfolios',
             'httpMethod' => HttpMethod::PUT,
         ],
         'getPortfoliosExtended' => [
-            'path'       => '/v2/portfolios/extended/',
+            'path'       => '/v2/portfolios/extended',
             'httpMethod' => HttpMethod::GET,
         ],
         'getPortfolioExtended' => [
-            'path'       => '/v2/portfolios/extended/{portfolioId}/',
+            'path'       => '/v2/portfolios/extended/{portfolioId}',
             'httpMethod' => HttpMethod::GET,
         ],
         'getPortfoliosBudgetUsage' => [
-            'path'        => '/portfolios/budget/usage/',
+            'path'        => '/portfolios/budget/usage',
             'httpMethod'  => HttpMethod::POST,
             'accept'      => 'application/vnd.portfoliobudgetusage.v1+json',
             'contentType' => 'application/vnd.portfoliobudgetusage.v1+json',
@@ -74,24 +75,26 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         array $portfolioNames = [],
         array $portfolioStates = []
     ): GetPortfoliosResponse {
-        return GetPortfoliosResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        requestParams: new GetPortfoliosParams(
-                            [
-                                'portfolioIdFilter'    => $portfolioIds,
-                                'portfolioNameFilter'  => $portfolioNames,
-                                'portfolioStateFilter' => $portfolioStates,
-                            ]
-                        )
-                    ),
-                    __FUNCTION__
-                )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            requestParams: new GetPortfoliosParams(
+                [
+                    'portfolioIdFilter'    => $portfolioIds,
+                    'portfolioNameFilter'  => $portfolioNames,
+                    'portfolioStateFilter' => $portfolioStates,
+                ]
             )
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return GetPortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -104,20 +107,22 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         int $profileId,
         int $portfolioId
     ): Portfolio {
-        return Portfolio::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(
-                            __FUNCTION__,
-                            ['{portfolioId}' => Cast::toString($portfolioId)]
-                        ),
-                        profileId: $profileId
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(
+                __FUNCTION__,
+                ['{portfolioId}' => Cast::toString($portfolioId)]
+            ),
+            profileId: $profileId
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return Portfolio::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -130,18 +135,20 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         int $profileId,
         PortfolioList $portfolios
     ): CreateOrUpdatePortfoliosResponse {
-        return CreateOrUpdatePortfoliosResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        body: new PortfolioCreateRequest($portfolios)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            body: new PortfolioCreateRequest($portfolios)
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -154,18 +161,20 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         int $profileId,
         PortfolioList $portfolios
     ): CreateOrUpdatePortfoliosResponse {
-        return CreateOrUpdatePortfoliosResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        body: new PortfolioUpdateRequest($portfolios)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            body: new PortfolioUpdateRequest($portfolios)
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -184,24 +193,26 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         array $portfolioNames = [],
         array $portfolioStates = []
     ): GetPortfoliosExtendedResponse {
-        return GetPortfoliosExtendedResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        requestParams: new GetPortfoliosParams(
-                            [
-                                'portfolioIdFilter'    => $portfolioIds,
-                                'portfolioNameFilter'  => $portfolioNames,
-                                'portfolioStateFilter' => $portfolioStates,
-                            ]
-                        )
-                    ),
-                    __FUNCTION__
-                )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            requestParams: new GetPortfoliosParams(
+                [
+                    'portfolioIdFilter'    => $portfolioIds,
+                    'portfolioNameFilter'  => $portfolioNames,
+                    'portfolioStateFilter' => $portfolioStates,
+                ]
             )
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return GetPortfoliosExtendedResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -214,20 +225,22 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         int $profileId,
         int $portfolioId
     ): PortfolioEx {
-        return PortfolioEx::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(
-                            __FUNCTION__,
-                            ['{portfolioId}' => Cast::toString($portfolioId)]
-                        ),
-                        profileId: $profileId
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(
+                __FUNCTION__,
+                ['{portfolioId}' => Cast::toString($portfolioId)]
+            ),
+            profileId: $profileId
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return PortfolioEx::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 
@@ -242,18 +255,20 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         int $profileId,
         array $portfolioIds
     ): PortfolioBudgetUsageResponse {
-        return PortfolioBudgetUsageResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId,
-                        body: new PortfolioBudgetUsageRequest($portfolioIds)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId,
+            body: new PortfolioBudgetUsageRequest($portfolioIds)
+        );
+
+        if ($responseResource->hasSucceeded()) {
+            return PortfolioBudgetUsageResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(
+            responseResource: $responseResource,
+            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
         );
     }
 }

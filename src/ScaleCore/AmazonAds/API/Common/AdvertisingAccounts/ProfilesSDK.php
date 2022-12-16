@@ -25,15 +25,15 @@ final class ProfilesSDK extends SubLevelSDK implements AdsSDKInterface
     /** @var array<string, array<string, mixed>> */
     protected array $resourceData = [
         'getProfiles' => [
-            'path'       => '/v2/profiles/',
+            'path'       => '/v2/profiles',
             'httpMethod' => HttpMethod::GET,
         ],
         'getProfile' => [
-            'path'       => '/v2/profiles/{profileId}/',
+            'path'       => '/v2/profiles/{profileId}',
             'httpMethod' => HttpMethod::GET,
         ],
         'updateProfilesDailyBudget' => [
-            'path'       => '/v2/profiles/',
+            'path'       => '/v2/profiles',
             'httpMethod' => HttpMethod::PUT,
         ],
     ];
@@ -54,25 +54,24 @@ final class ProfilesSDK extends SubLevelSDK implements AdsSDKInterface
         ?AccountType $profileTypeFilter = null,
         ?bool $validPaymentMethodFilter = null
     ): GetProfilesResponse {
-        return GetProfilesResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        requestParams: new GetProfilesParams(
-                            [
-                                'apiProgram'               => $apiProgram,
-                                'accessLevel'              => $accessLevel,
-                                'profileTypeFilter'        => $profileTypeFilter,
-                                'validPaymentMethodFilter' => $validPaymentMethodFilter,
-                            ]
-                        )
-                    ),
-                    __FUNCTION__
-                )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            requestParams: new GetProfilesParams(
+                [
+                    'apiProgram'               => $apiProgram,
+                    'accessLevel'              => $accessLevel,
+                    'profileTypeFilter'        => $profileTypeFilter,
+                    'validPaymentMethodFilter' => $validPaymentMethodFilter,
+                ]
             )
         );
+
+        if ($responseResource->hasSucceeded()) {
+            return GetProfilesResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -88,20 +87,19 @@ final class ProfilesSDK extends SubLevelSDK implements AdsSDKInterface
         Region $region,
         int $profileId
     ): Profile {
-        return Profile::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(
-                            __FUNCTION__,
-                            ['{profileId}' => Cast::toString($profileId)]
-                        )
-                    ),
-                    __FUNCTION__
-                )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(
+                __FUNCTION__,
+                ['{profileId}' => Cast::toString($profileId)]
             )
         );
+
+        if ($responseResource->hasSucceeded()) {
+            return Profile::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -117,17 +115,16 @@ final class ProfilesSDK extends SubLevelSDK implements AdsSDKInterface
         Region $region,
         ProfileList $profiles
     ): ProfilesDailyBudgetUpdateResponse {
-        return ProfilesDailyBudgetUpdateResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        body: new ProfilesDailyBudgetUpdateRequest($profiles)
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            body: new ProfilesDailyBudgetUpdateRequest($profiles)
         );
+
+        if ($responseResource->hasSucceeded()) {
+            return ProfilesDailyBudgetUpdateResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 }

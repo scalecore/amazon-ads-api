@@ -11,6 +11,7 @@ use ScaleCore\AmazonAds\Enums\MimeType;
 final class RequestResource
 {
     private function __construct(
+        public readonly string $operation,
         public readonly string $path,
         public readonly HttpMethod $httpMethod,
         public readonly string|MimeType $accept,
@@ -24,6 +25,7 @@ final class RequestResource
     public static function for(AdsSubLevelSDKInterface $sdk, string $operation, array $pathReplacements = []): self
     {
         return new self(
+            operation: $operation,
             path: self::replacePathParams($sdk->getRequestResourceDataPath($operation), $pathReplacements),
             httpMethod: $sdk->getRequestResourceDataHttpMethod($operation),
             accept: $sdk->getRequestResourceDataAcceptHeader($operation),

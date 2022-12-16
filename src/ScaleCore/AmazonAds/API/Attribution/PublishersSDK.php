@@ -16,7 +16,7 @@ final class PublishersSDK extends SubLevelSDK implements AdsSDKInterface
     /** @var array<string, array<string, mixed>> */
     protected array $resourceData = [
         'getPublishers' => [
-            'path'       => '/attribution/publishers/',
+            'path'       => '/attribution/publishers',
             'httpMethod' => HttpMethod::GET,
         ],
     ];
@@ -27,17 +27,16 @@ final class PublishersSDK extends SubLevelSDK implements AdsSDKInterface
      */
     public function getPublishers(Region $region, int $profileId): PublishersResponse
     {
-        return PublishersResponse::fromJsonData(
-            $this->decodeResponseBody(
-                $this->getResponse(
-                    $this->getRequest(
-                        region: $region,
-                        requestResourceData: $this->getRequestResource(__FUNCTION__),
-                        profileId: $profileId
-                    ),
-                    __FUNCTION__
-                )
-            )
+        $responseResource = $this->getResponseResource(
+            region: $region,
+            requestResourceData: $this->getRequestResource(__FUNCTION__),
+            profileId: $profileId
         );
+
+        if ($responseResource->hasSucceeded()) {
+            return PublishersResponse::fromJsonData($responseResource->decodeResponseBody());
+        }
+
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 }

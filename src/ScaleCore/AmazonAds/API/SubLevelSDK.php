@@ -8,8 +8,10 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use ScaleCore\AmazonAds\Contracts\AdsSubLevelSDKInterface;
+use ScaleCore\AmazonAds\Contracts\ApiErrorInterface;
 use ScaleCore\AmazonAds\Contracts\Arrayable;
 use ScaleCore\AmazonAds\Contracts\HttpRequestBodyInterface;
+use ScaleCore\AmazonAds\Contracts\ResponseResourceInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\MimeType;
 use ScaleCore\AmazonAds\Enums\Region;
@@ -18,6 +20,7 @@ use ScaleCore\AmazonAds\Helpers\Arr;
 use ScaleCore\AmazonAds\Helpers\Cast;
 use ScaleCore\AmazonAds\Models\RequestParams;
 use ScaleCore\AmazonAds\Models\RequestResource;
+use ScaleCore\AmazonAds\Models\ResponseResource;
 use ScaleCore\AmazonAds\Support\HttpHeaderName;
 
 abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
@@ -157,7 +160,50 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
         return $params instanceof Arrayable ? $url . '?' . \http_build_query($params->toArray()) : $url;
     }
 
-    protected function getRequest(
+    protected function getResponseResource(
+        Region $region,
+        RequestResource $requestResourceData,
+        ?int $profileId = null,
+        ?RequestParams $requestParams = null,
+        ?HttpRequestBodyInterface $body = null
+    ): ResponseResourceInterface {
+        $request = $this->getRequest(
+            region: $region,
+            requestResourceData: $requestResourceData,
+            profileId: $profileId,
+            requestParams: $requestParams,
+            body: $body
+        );
+
+        $response = $this->getResponse(
+            request: $request,
+            operation: $requestResourceData->operation
+        );
+
+        return ResponseResource::for($request, $response);
+    }
+
+    /**
+     * @throws ApiException
+     */
+    protected function throwApiResponseException(
+        string $message = '',
+        int $code = 0,
+        ?\Throwable $previous = null,
+        ?ResponseResourceInterface $responseResource = null,
+        ?ApiErrorInterface $apiError = null
+    ): never {
+        throw new ApiException(
+            message: $message,
+            code: $code,
+            previous: $previous,
+            request: $responseResource?->getRequest(),
+            response: $responseResource?->getResponse(),
+            apiError: $apiError
+        );
+    }
+
+    private function getRequest(
         Region $region,
         RequestResource $requestResourceData,
         ?int $profileId = null,
@@ -202,8 +248,10 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
     /**
      * @throws ApiException
      */
-    protected function getResponse(RequestInterface $request, string $operation): ResponseInterface
-    {
+    private function getResponse(
+        RequestInterface $request,
+        string $operation
+    ): ResponseInterface {
         try {
             $correlationId  = $this->configuration->getIdGenerator()->generate();
             $loggingEnabled = $this->configuration->loggingEnabled($this::class, $operation);
@@ -253,7 +301,7 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
                 );
             }
         } catch (ClientExceptionInterface $e) {
-            $this->throwApiException(
+            throw new ApiException(
                 message: "[{$e->getCode()}] {$e->getMessage()}",
                 code: Cast::toInt($e->getCode()),
                 previous: $e,
@@ -261,47 +309,6 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
             );
         }
 
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode >= 200 && $statusCode < 300) {
-            return $response;
-        }
-
-        $this->throwApiException(request: $request, response: $response);
-    }
-
-    /**
-     * @throws \JsonException
-     */
-    protected function decodeResponseBody(ResponseInterface $response): mixed
-    {
-        return match (MimeType::tryFrom($response->getHeader(HttpHeaderName::CONTENT_TYPE)[0] ?? '')) {
-            MimeType::JSON,
-            MimeType::OCTET_STREAM => Cast::fromJson(
-                json: Cast::toString($response->getBody()),
-                associative: true
-            ),
-            MimeType::TEXT_PLAIN => Cast::toString($response->getBody()),
-            default              => $response->getBody(),
-        };
-    }
-
-    /**
-     * @throws ApiException
-     */
-    protected function throwApiException(
-        string $message = '',
-        int $code = 0,
-        ?\Throwable $previous = null,
-        ?RequestInterface $request = null,
-        ?ResponseInterface $response = null
-    ): never {
-        throw new ApiException(
-            message: $message,
-            code: $code,
-            previous: $previous,
-            request: $request,
-            response: $response
-        );
+        return $response;
     }
 }

@@ -11,7 +11,9 @@ use Square\Pjson\JsonSerialize;
 
 final class GetPortfoliosResponse extends BaseModel
 {
-    use JsonSerialize;
+    use JsonSerialize {
+        fromJsonData as traitFromJsonData;
+    }
 
     /**
      * Array of Portfolio objects.
@@ -20,4 +22,13 @@ final class GetPortfoliosResponse extends BaseModel
      */
     #[Json(type: Portfolio::class)]
     public ?array $portfolios;
+
+    /**
+     * @param array<array-key, mixed>         $jd
+     * @param array<array-key, string>|string $path
+     */
+    public static function fromJsonData($jd, array|string $path = []): static
+    {
+        return static::traitFromJsonData(['portfolios' => $jd], $path);
+    }
 }

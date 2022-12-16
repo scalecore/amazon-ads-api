@@ -10,7 +10,9 @@ use Square\Pjson\JsonSerialize;
 
 final class ProfilesDailyBudgetUpdateResponse extends BaseModel
 {
-    use JsonSerialize;
+    use JsonSerialize {
+        fromJsonData as traitFromJsonData;
+    }
 
     /**
      * Array of ProfileResponse objects.
@@ -19,4 +21,13 @@ final class ProfilesDailyBudgetUpdateResponse extends BaseModel
      */
     #[Json(type: ProfileResponse::class)]
     public ?array $profiles;
+
+    /**
+     * @param array<array-key, mixed>         $jd
+     * @param array<array-key, string>|string $path
+     */
+    public static function fromJsonData($jd, array|string $path = []): static
+    {
+        return static::traitFromJsonData(['profiles' => $jd], $path);
+    }
 }
