@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use ScaleCore\AmazonAds\Models\ApiError;
+use ScaleCore\AmazonAds\Models\Errors\ApiError;
 
 test(
     'ApiError from string props is valid',
@@ -16,7 +16,7 @@ HERE;
 
         $error = new ApiError($strProps);
         expect($error->getCode())->toEqual('404');
-        expect($error->getDetails())->toEqual('Object or resource not found.');
+        expect($error->getMessage())->toEqual('Object or resource not found.');
     }
 );
 
@@ -30,7 +30,7 @@ test(
 
         $error = new ApiError($arrProps);
         expect($error->getCode())->toEqual('404');
-        expect($error->getDetails())->toEqual('Object or resource not found.');
+        expect($error->getMessage())->toEqual('Object or resource not found.');
     }
 );
 
@@ -44,6 +44,6 @@ test(
 
         $error = new ApiError($objProps);
         expect($error->getCode())->toEqual('404');
-        expect($error->getDetails())->toEqual('Object or resource not found.');
+        expect($error->getMessage())->toEqual('Object or resource not found.');
     }
 );

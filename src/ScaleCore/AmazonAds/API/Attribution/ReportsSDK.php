@@ -13,7 +13,6 @@ use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
 use function ScaleCore\AmazonAds\Helpers\tap;
-use ScaleCore\AmazonAds\Models\ApiError;
 use ScaleCore\AmazonAds\Models\Attribution\PerformanceReportEntry;
 use ScaleCore\AmazonAds\Models\Attribution\RequestBodies\PerformanceReportRequest;
 use ScaleCore\AmazonAds\Models\Attribution\RequestBodies\ProductReportRequest;
@@ -69,10 +68,7 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
             return ProductReportResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -115,10 +111,7 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
             );
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     private function addGroupByToResponse(

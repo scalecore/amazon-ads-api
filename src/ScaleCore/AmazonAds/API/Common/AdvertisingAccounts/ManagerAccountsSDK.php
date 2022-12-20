@@ -11,7 +11,6 @@ use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\AccountToUpdateList;
-use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\ErrorDetail;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\ManagerAccount;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\RequestBodies\CreateManagerAccountRequest;
 use ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts\RequestBodies\UpdateAdvertisingAccountsInManagerAccountRequest;
@@ -89,10 +88,7 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
             return ManagerAccount::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ErrorDetail::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -119,10 +115,7 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
             return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ErrorDetail::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -149,9 +142,6 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
             return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ErrorDetail::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 }

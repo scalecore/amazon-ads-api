@@ -11,7 +11,6 @@ use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
 use ScaleCore\AmazonAds\Helpers\Cast;
-use ScaleCore\AmazonAds\Models\ApiError;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\Portfolio;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioEx;
 use ScaleCore\AmazonAds\Models\Common\Portfolios\PortfolioList;
@@ -92,10 +91,7 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
             return GetPortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -120,10 +116,7 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
             return Portfolio::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -146,10 +139,7 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
             return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -172,10 +162,7 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
             return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -210,10 +197,7 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
             return GetPortfoliosExtendedResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -238,10 +222,7 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
             return PortfolioEx::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -266,9 +247,6 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
             return PortfolioBudgetUsageResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 }

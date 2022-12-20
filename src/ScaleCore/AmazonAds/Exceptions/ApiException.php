@@ -55,7 +55,7 @@ class ApiException extends \Exception
             return $code;
         }
 
-        return Cast::toInt($this->apiError?->getCode() ?? $this->response?->getStatusCode() ?? $code);
+        return Cast::toInt($this->response?->getStatusCode() ?? $code);
     }
 
     protected function initMessage(string $message, int $code): string
@@ -64,7 +64,7 @@ class ApiException extends \Exception
             return $message;
         }
 
-        $subMessage = $this->apiError?->getDetails() ?? $this->response?->getReasonPhrase();
+        $subMessage = $this->apiError?->getMessage() ?? $this->response?->getReasonPhrase();
 
         return sprintf(
             '[%s] %s (%s)',

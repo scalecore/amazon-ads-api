@@ -11,17 +11,23 @@ use ScaleCore\AmazonAds\Contracts\AdsSubLevelSDKInterface;
 use ScaleCore\AmazonAds\Contracts\ApiErrorInterface;
 use ScaleCore\AmazonAds\Contracts\Arrayable;
 use ScaleCore\AmazonAds\Contracts\HttpRequestBodyInterface;
-use ScaleCore\AmazonAds\Contracts\ResponseResourceInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\MimeType;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
 use ScaleCore\AmazonAds\Helpers\Arr;
 use ScaleCore\AmazonAds\Helpers\Cast;
+use ScaleCore\AmazonAds\Models\Errors\AccessDeniedError;
+use ScaleCore\AmazonAds\Models\Errors\ApiError;
+use ScaleCore\AmazonAds\Models\Errors\ApiThrottlingError;
+use ScaleCore\AmazonAds\Models\Errors\InternalServerError;
+use ScaleCore\AmazonAds\Models\Errors\UnauthorizedError;
+use ScaleCore\AmazonAds\Models\Errors\UnsupportedMediaTypeError;
 use ScaleCore\AmazonAds\Models\RequestParams;
 use ScaleCore\AmazonAds\Models\RequestResource;
 use ScaleCore\AmazonAds\Models\ResponseResource;
 use ScaleCore\AmazonAds\Support\HttpHeaderName;
+use ScaleCore\AmazonAds\Support\HttpResponseStatusCode as Http;
 
 abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
 {
@@ -160,13 +166,16 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
         return $params instanceof Arrayable ? $url . '?' . \http_build_query($params->toArray()) : $url;
     }
 
+    /**
+     * @throws ApiException
+     */
     protected function getResponseResource(
         Region $region,
         RequestResource $requestResourceData,
         ?int $profileId = null,
         ?RequestParams $requestParams = null,
         ?HttpRequestBodyInterface $body = null
-    ): ResponseResourceInterface {
+    ): ResponseResource {
         $request = $this->getRequest(
             region: $region,
             requestResourceData: $requestResourceData,
@@ -185,22 +194,45 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
 
     /**
      * @throws ApiException
+     * @throws \JsonException
      */
     protected function throwApiResponseException(
+        ResponseResource $responseResource,
         string $message = '',
         int $code = 0,
         ?\Throwable $previous = null,
-        ?ResponseResourceInterface $responseResource = null,
         ?ApiErrorInterface $apiError = null
     ): never {
         throw new ApiException(
             message: $message,
             code: $code,
             previous: $previous,
-            request: $responseResource?->getRequest(),
-            response: $responseResource?->getResponse(),
-            apiError: $apiError
+            request: $responseResource->getRequest(),
+            response: $responseResource->getResponse(),
+            apiError: $apiError ?? $this->getApiError($responseResource)
         );
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    protected function getApiError(ResponseResource $responseResource): ApiErrorInterface
+    {
+        return match ($responseResource->getResponseStatusCode()) {
+            Http::UNAUTHORIZED           => UnauthorizedError::fromJsonData($responseResource->decodeResponseBody()),
+            Http::FORBIDDEN              => AccessDeniedError::fromJsonData($responseResource->decodeResponseBody()),
+            Http::UNSUPPORTED_MEDIA_TYPE => UnsupportedMediaTypeError::fromJsonData($responseResource->decodeResponseBody()),
+            Http::TOO_MANY_REQUESTS      => ApiThrottlingError::fromJsonData($responseResource->decodeResponseBody())
+                                                              ->setRetryAfter(
+                                                                  Cast::toInt(
+                                                                      $responseResource
+                                                                          ->getResponse()
+                                                                          ->getHeader(HttpHeaderName::RETRY_AFTER)[0] ?? 0
+                                                                  )
+                                                              ),
+            Http::INTERNAL_SERVER_ERROR => InternalServerError::fromJsonData($responseResource->decodeResponseBody()),
+            default                     => ApiError::fromJsonData($responseResource->decodeResponseBody()),
+        };
     }
 
     private function getRequest(

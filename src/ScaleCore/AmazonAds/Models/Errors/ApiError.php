@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ScaleCore\AmazonAds\Models;
+namespace ScaleCore\AmazonAds\Models\Errors;
 
 use ScaleCore\AmazonAds\Contracts\ApiErrorInterface;
+use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
@@ -22,6 +23,12 @@ class ApiError extends BaseModel implements ApiErrorInterface
      * A human-readable description of the error.
      */
     #[Json]
+    public ?string $message;
+
+    /**
+     * A human-readable description of the error.
+     */
+    #[Json]
     public ?string $details;
 
     public function getCode(): ?string
@@ -29,8 +36,13 @@ class ApiError extends BaseModel implements ApiErrorInterface
         return $this->code;
     }
 
+    public function getMessage(): ?string
+    {
+        return $this->message ?? $this->details;
+    }
+
     public function getDetails(): ?string
     {
-        return $this->details;
+        return $this->details ?? $this->message;
     }
 }

@@ -6,12 +6,11 @@ namespace ScaleCore\AmazonAds\Models;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use ScaleCore\AmazonAds\Contracts\ResponseResourceInterface;
 use ScaleCore\AmazonAds\Enums\MimeType;
 use ScaleCore\AmazonAds\Helpers\Cast;
 use ScaleCore\AmazonAds\Support\HttpHeaderName;
 
-final class ResponseResource implements ResponseResourceInterface
+final class ResponseResource
 {
     public function __construct(
         private readonly RequestInterface $request,
@@ -44,11 +43,6 @@ final class ResponseResource implements ResponseResourceInterface
         $statusCode = $this->getResponseStatusCode();
 
         return $statusCode >= 200 && $statusCode < 300;
-    }
-
-    public function hasFailed(): bool
-    {
-        return ! $this->hasSucceeded();
     }
 
     /**

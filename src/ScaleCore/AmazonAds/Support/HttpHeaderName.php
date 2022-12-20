@@ -13,4 +13,5 @@ final class HttpHeaderName
     public const AMAZON_CLIENT_ID = 'Amazon-Advertising-API-ClientId';
     public const AMAZON_SCOPE     = 'Amazon-Advertising-API-Scope';
     public const AUTHORIZATION    = 'Authorization';
+    public const RETRY_AFTER      = 'Retry-After';
 }
