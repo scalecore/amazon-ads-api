@@ -9,7 +9,6 @@ use ScaleCore\AmazonAds\Contracts\AdsSDKInterface;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
-use ScaleCore\AmazonAds\Models\ApiError;
 use ScaleCore\AmazonAds\Models\Attribution\RequestParams\TagParams;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\AttributionTagResponse;
 
@@ -56,10 +55,7 @@ final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
             return AttributionTagResponse::fromJsonData($responseResource->decodeResponseBody());
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 
     /**
@@ -94,9 +90,6 @@ final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
             );
         }
 
-        $this->throwApiResponseException(
-            responseResource: $responseResource,
-            apiError: ApiError::fromJsonData($responseResource->decodeResponseBody())
-        );
+        $this->throwApiResponseException(responseResource: $responseResource);
     }
 }

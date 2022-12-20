@@ -12,7 +12,12 @@ interface ApiErrorInterface
     public function getCode(): ?string;
 
     /**
-     * Get the details of the error.
+     * Get the human-readable message/details of the error.
+     */
+    public function getMessage(): ?string;
+
+    /**
+     * Get the human-readable details/message of the error.
      */
     public function getDetails(): ?string;
 }

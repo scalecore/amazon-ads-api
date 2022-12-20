@@ -4,17 +4,8 @@ declare(strict_types=1);
 
 namespace ScaleCore\AmazonAds\Models\Common\AdvertisingAccounts\ManagerAccounts;
 
-use ScaleCore\AmazonAds\Models\ApiError;
-use Square\Pjson\Json;
-use Square\Pjson\JsonSerialize;
+use ScaleCore\AmazonAds\Models\Errors\ApiError;
 
 final class ErrorDetail extends ApiError
 {
-    use JsonSerialize;
-
-    /**
-     * A human-readable description of the error.
-     */
-    #[Json('message')]
-    public ?string $details;
 }
