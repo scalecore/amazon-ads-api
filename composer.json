@@ -38,7 +38,7 @@
     "psr/http-client": "^1.0",
     "psr/http-factory": "^1.0",
     "psr/log": "^1.1",
-    "square/pjson": "^0.2.0"
+    "square/pjson": "^0.3.0"
   },
   "require-dev": {
     "dg/bypass-finals": "^1.4",
