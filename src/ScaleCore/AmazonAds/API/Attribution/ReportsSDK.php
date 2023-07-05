@@ -12,12 +12,12 @@ use ScaleCore\AmazonAds\Enums\Attribution\ProductReportMetric;
 use ScaleCore\AmazonAds\Enums\HttpMethod;
 use ScaleCore\AmazonAds\Enums\Region;
 use ScaleCore\AmazonAds\Exceptions\ApiException;
-use function ScaleCore\AmazonAds\Helpers\tap;
 use ScaleCore\AmazonAds\Models\Attribution\PerformanceReportEntry;
 use ScaleCore\AmazonAds\Models\Attribution\RequestBodies\PerformanceReportRequest;
 use ScaleCore\AmazonAds\Models\Attribution\RequestBodies\ProductReportRequest;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\PerformanceReportResponse;
 use ScaleCore\AmazonAds\Models\Attribution\Responses\ProductReportResponse;
+use function ScaleCore\AmazonAds\Helpers\tap;
 
 final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
 {
@@ -65,7 +65,8 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return ProductReportResponse::fromJsonData($responseResource->decodeResponseBody());
+            return ProductReportResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -108,6 +109,7 @@ final class ReportsSDK extends SubLevelSDK implements AdsSDKInterface
             return $this->addGroupByToResponse(
                 $groupBy,
                 PerformanceReportResponse::fromJsonData($responseResource->decodeResponseBody())
+                    ->setCorrelationId($responseResource->getCorrelationId())
             );
         }
 

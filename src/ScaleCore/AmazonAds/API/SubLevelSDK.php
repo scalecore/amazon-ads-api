@@ -176,6 +176,8 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
         ?RequestParams $requestParams = null,
         ?HttpRequestBodyInterface $body = null
     ): ResponseResource {
+        $correlationId = $this->configuration->getIdGenerator()->generate();
+
         $request = $this->getRequest(
             region: $region,
             requestResourceData: $requestResourceData,
@@ -186,10 +188,15 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
 
         $response = $this->getResponse(
             request: $request,
-            operation: $requestResourceData->operation
+            operation: $requestResourceData->operation,
+            correlationId: $correlationId,
         );
 
-        return ResponseResource::for($request, $response);
+        return ResponseResource::for(
+            request: $request,
+            response: $response,
+            correlationId: $correlationId,
+        );
     }
 
     /**
@@ -209,7 +216,8 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
             previous: $previous,
             request: $responseResource->getRequest(),
             response: $responseResource->getResponse(),
-            apiError: $apiError ?? $this->getApiError($responseResource)
+            apiError: $apiError ?? $this->getApiError($responseResource),
+            correlationId: $responseResource->getCorrelationId(),
         );
     }
 
@@ -282,10 +290,10 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
      */
     private function getResponse(
         RequestInterface $request,
-        string $operation
+        string $operation,
+        string $correlationId,
     ): ResponseInterface {
         try {
-            $correlationId  = $this->configuration->getIdGenerator()->generate();
             $loggingEnabled = $this->configuration->loggingEnabled($this::class, $operation);
             $logLevel       = $this->configuration->getLogLevel($this::class, $operation);
 
@@ -337,7 +345,8 @@ abstract class SubLevelSDK extends BaseSDK implements AdsSubLevelSDKInterface
                 message: "[{$e->getCode()}] {$e->getMessage()}",
                 code: Cast::toInt($e->getCode()),
                 previous: $e,
-                request: $request
+                request: $request,
+                correlationId: $correlationId,
             );
         }
 

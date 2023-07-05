@@ -6,8 +6,8 @@ namespace ScaleCore\AmazonAds\Models\Attribution\RequestBodies;
 
 use ScaleCore\AmazonAds\Contracts\Attribution\ReportMetricInterface;
 use ScaleCore\AmazonAds\Enums\Attribution\ReportType;
-use function ScaleCore\AmazonAds\Helpers\tap;
 use ScaleCore\AmazonAds\Models\BaseRequestBody;
+use function ScaleCore\AmazonAds\Helpers\tap;
 
 /**
  * @template TKey of array-key
