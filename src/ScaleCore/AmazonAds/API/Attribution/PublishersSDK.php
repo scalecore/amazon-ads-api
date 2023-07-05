@@ -34,7 +34,8 @@ final class PublishersSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return PublishersResponse::fromJsonData($responseResource->decodeResponseBody());
+            return PublishersResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);

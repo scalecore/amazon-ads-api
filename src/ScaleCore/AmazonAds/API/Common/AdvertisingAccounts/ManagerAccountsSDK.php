@@ -61,7 +61,8 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return GetManagerAccountsResponse::fromJsonData($responseResource->decodeResponseBody());
+            return GetManagerAccountsResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -85,7 +86,8 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return ManagerAccount::fromJsonData($responseResource->decodeResponseBody());
+            return ManagerAccount::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -112,7 +114,9 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData($responseResource->decodeResponseBody());
+            return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData(
+                $responseResource->decodeResponseBody()
+            )->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -139,7 +143,9 @@ final class ManagerAccountsSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData($responseResource->decodeResponseBody());
+            return UpdateAdvertisingAccountsInManagerAccountResponse::fromJsonData(
+                $responseResource->decodeResponseBody()
+            )->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);

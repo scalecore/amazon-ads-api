@@ -52,7 +52,8 @@ final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return AttributionTagResponse::fromJsonData($responseResource->decodeResponseBody());
+            return AttributionTagResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -87,7 +88,7 @@ final class TagsSDK extends SubLevelSDK implements AdsSDKInterface
             return AttributionTagResponse::fromJsonData(
                 $responseResource->decodeResponseBody(),
                 supportsMacros: false
-            );
+            )->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);

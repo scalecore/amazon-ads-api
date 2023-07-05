@@ -17,7 +17,8 @@ class ApiException extends \Exception
         ?\Throwable $previous = null,
         protected readonly ?RequestInterface $request = null,
         protected readonly ?ResponseInterface $response = null,
-        protected readonly ?ApiErrorInterface $apiError = null
+        protected readonly ?ApiErrorInterface $apiError = null,
+        protected readonly ?string $correlationId = null,
     ) {
         $code    = $this->initCode($code);
         $message = $this->initMessage($message, $code);
@@ -47,6 +48,14 @@ class ApiException extends \Exception
     public function getApiError(): ?ApiErrorInterface
     {
         return $this->apiError;
+    }
+
+    /**
+     * Returns the identifier used to tie API call logging together.
+     */
+    public function getCorrelationId(): ?string
+    {
+        return $this->correlationId;
     }
 
     protected function initCode(int $code): int
