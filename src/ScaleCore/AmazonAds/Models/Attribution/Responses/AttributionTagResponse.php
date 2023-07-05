@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace ScaleCore\AmazonAds\Models\Attribution\Responses;
 
 use ScaleCore\AmazonAds\Helpers\Cast;
-use function ScaleCore\AmazonAds\Helpers\tap;
 use ScaleCore\AmazonAds\Models\Attribution\AttributionTagMap;
 use ScaleCore\AmazonAds\Models\BaseModel;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
+use function ScaleCore\AmazonAds\Helpers\tap;
 
 final class AttributionTagResponse extends BaseModel
 {

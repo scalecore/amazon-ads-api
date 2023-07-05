@@ -88,7 +88,8 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return GetPortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
+            return GetPortfoliosResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -113,7 +114,8 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return Portfolio::fromJsonData($responseResource->decodeResponseBody());
+            return Portfolio::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -136,7 +138,8 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
+            return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -159,7 +162,8 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody());
+            return CreateOrUpdatePortfoliosResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -194,7 +198,8 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return GetPortfoliosExtendedResponse::fromJsonData($responseResource->decodeResponseBody());
+            return GetPortfoliosExtendedResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -219,7 +224,8 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return PortfolioEx::fromJsonData($responseResource->decodeResponseBody());
+            return PortfolioEx::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -244,7 +250,8 @@ final class PortfoliosSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return PortfolioBudgetUsageResponse::fromJsonData($responseResource->decodeResponseBody());
+            return PortfolioBudgetUsageResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);

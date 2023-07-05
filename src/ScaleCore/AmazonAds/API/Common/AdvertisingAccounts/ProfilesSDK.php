@@ -68,7 +68,8 @@ final class ProfilesSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return GetProfilesResponse::fromJsonData($responseResource->decodeResponseBody());
+            return GetProfilesResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -96,7 +97,8 @@ final class ProfilesSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return Profile::fromJsonData($responseResource->decodeResponseBody());
+            return Profile::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);
@@ -122,7 +124,8 @@ final class ProfilesSDK extends SubLevelSDK implements AdsSDKInterface
         );
 
         if ($responseResource->hasSucceeded()) {
-            return ProfilesDailyBudgetUpdateResponse::fromJsonData($responseResource->decodeResponseBody());
+            return ProfilesDailyBudgetUpdateResponse::fromJsonData($responseResource->decodeResponseBody())
+                ->setCorrelationId($responseResource->getCorrelationId());
         }
 
         $this->throwApiResponseException(responseResource: $responseResource);

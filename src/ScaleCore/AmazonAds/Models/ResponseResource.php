@@ -14,13 +14,25 @@ final class ResponseResource
 {
     public function __construct(
         private readonly RequestInterface $request,
-        private readonly ResponseInterface $response
+        private readonly ResponseInterface $response,
+        private readonly string $correlationId,
     ) {
     }
 
-    public static function for(RequestInterface $request, ResponseInterface $response): self
+    public static function for(
+        RequestInterface $request,
+        ResponseInterface $response,
+        string $correlationId
+    ): self {
+        return new self($request, $response, $correlationId);
+    }
+
+    /**
+     * Identifier used to tie API call logging together.
+     */
+    public function getCorrelationId(): string
     {
-        return new self($request, $response);
+        return $this->correlationId;
     }
 
     public function getRequest(): RequestInterface

@@ -11,6 +11,10 @@ use Square\Pjson\Json;
 
 abstract class BaseModel implements Jsonable
 {
+    /** Identifier used to tie API call logging together. */
+    #[Json(omit_empty: true)]
+    protected ?string $correlationId = null;
+
     /**
      * @param object|array<array-key, mixed>|string $properties = null
      *
@@ -19,6 +23,24 @@ abstract class BaseModel implements Jsonable
     public function __construct(object|array|string $properties = [])
     {
         $this->constructFromMixedData($properties);
+    }
+
+    /**
+     * Sets the identifier used to tie API call logging together.
+     */
+    public function setCorrelationId(?string $correlationId): static
+    {
+        $this->correlationId = $correlationId;
+
+        return $this;
+    }
+
+    /**
+     * Returns the identifier used to tie API call logging together.
+     */
+    public function getCorrelationId(): ?string
+    {
+        return $this->correlationId;
     }
 
     /**
