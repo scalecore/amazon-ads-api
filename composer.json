@@ -37,7 +37,7 @@
     "ext-zlib": "*",
     "psr/http-client": "^1.0",
     "psr/http-factory": "^1.0",
-    "psr/log": "^1.1",
+    "psr/log": "^1.1 || ^2.0 || ^3.0",
     "square/pjson": "^0.3.0"
   },
   "require-dev": {
